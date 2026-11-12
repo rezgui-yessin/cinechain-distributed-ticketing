@@ -53,54 +53,38 @@
     <button
       type="button"
       (click)="setStatusTab('ALL')"
-      [class.text-amber-400]="selectedStatusTab === 'ALL'"
-      [class.border-amber-500]="selectedStatusTab === 'ALL'"
-      [class.bg-amber-500/10]="selectedStatusTab === 'ALL'"
-      [class.text-gray-400]="selectedStatusTab !== 'ALL'"
-      [class.border-transparent]="selectedStatusTab !== 'ALL'"
+      [ngClass]="selectedStatusTab === 'ALL' ? 'text-amber-400 border-amber-500 bg-amber-500/10' : 'text-gray-400 border-transparent'"
       class="px-4 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5">
       <span>All Passes</span>
-      <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ tickets.length }}</span>
+      <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ tickets.length }}</span>
     </button>
 
     <button
       type="button"
       (click)="setStatusTab('ACTIVE')"
-      [class.text-amber-400]="selectedStatusTab === 'ACTIVE'"
-      [class.border-amber-500]="selectedStatusTab === 'ACTIVE'"
-      [class.bg-amber-500/10]="selectedStatusTab === 'ACTIVE'"
-      [class.text-gray-400]="selectedStatusTab !== 'ACTIVE'"
-      [class.border-transparent]="selectedStatusTab !== 'ACTIVE'"
+      [ngClass]="selectedStatusTab === 'ACTIVE' ? 'text-amber-400 border-amber-500 bg-amber-500/10' : 'text-gray-400 border-transparent'"
       class="px-4 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5">
       <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
       <span>Active</span>
-      <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ activeCount }}</span>
+      <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ activeCount }}</span>
     </button>
 
     <button
       type="button"
       (click)="setStatusTab('USED')"
-      [class.text-amber-400]="selectedStatusTab === 'USED'"
-      [class.border-amber-500]="selectedStatusTab === 'USED'"
-      [class.bg-amber-500/10]="selectedStatusTab === 'USED'"
-      [class.text-gray-400]="selectedStatusTab !== 'USED'"
-      [class.border-transparent]="selectedStatusTab !== 'USED'"
+      [ngClass]="selectedStatusTab === 'USED' ? 'text-amber-400 border-amber-500 bg-amber-500/10' : 'text-gray-400 border-transparent'"
       class="px-4 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5">
       <span>Used</span>
-      <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ usedCount }}</span>
+      <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ usedCount }}</span>
     </button>
 
     <button
       type="button"
       (click)="setStatusTab('CANCELLED')"
-      [class.text-amber-400]="selectedStatusTab === 'CANCELLED'"
-      [class.border-amber-500]="selectedStatusTab === 'CANCELLED'"
-      [class.bg-amber-500/10]="selectedStatusTab === 'CANCELLED'"
-      [class.text-gray-400]="selectedStatusTab !== 'CANCELLED'"
-      [class.border-transparent]="selectedStatusTab !== 'CANCELLED'"
+      [ngClass]="selectedStatusTab === 'CANCELLED' ? 'text-amber-400 border-amber-500 bg-amber-500/10' : 'text-gray-400 border-transparent'"
       class="px-4 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5">
       <span>Cancelled</span>
-      <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ cancelledCount }}</span>
+      <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-gray-800 text-gray-300">{{ cancelledCount }}</span>
     </button>
   </div>
 

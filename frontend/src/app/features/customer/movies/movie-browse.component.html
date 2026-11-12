@@ -87,13 +87,7 @@
       *ngFor="let g of genres"
       type="button"
       (click)="setGenre(g)"
-      [class.bg-amber-500]="selectedGenre === g"
-      [class.text-gray-950]="selectedGenre === g"
-      [class.font-bold]="selectedGenre === g"
-      [class.shadow-md]="selectedGenre === g"
-      [class.bg-[#12122a]]="selectedGenre !== g"
-      [class.text-gray-300]="selectedGenre !== g"
-      [class.border-gray-800]="selectedGenre !== g"
+      [ngClass]="selectedGenre === g ? 'bg-amber-500 text-gray-950 font-bold shadow-md' : 'bg-[#12122a] text-gray-300 border-gray-800'"
       class="px-3.5 py-1.5 rounded-full text-xs border border-transparent hover:border-amber-500/40 transition whitespace-nowrap">
       {{ g === 'ALL' ? 'All Genres' : g }}
     </button>

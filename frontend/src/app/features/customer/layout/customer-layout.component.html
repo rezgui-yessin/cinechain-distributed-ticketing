@@ -106,7 +106,7 @@
             <div 
               *ngFor="let item of notifications" 
               class="p-3.5 hover:bg-gray-800/40 transition cursor-pointer flex items-start space-x-3"
-              [class.bg-amber-500/5]="!item.read">
+              [ngClass]="{'bg-amber-500/5': !item.read}">
               <div 
                 class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold"
                 [ngClass]="{

@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ScreeningService } from '../../../core/services/screening.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { WebSocketService, SeatUpdatePayload, WsMessage } from '../../../core/services/websocket.service';
 import { Screening } from '../../../core/models/screening.model';
 import { Seat } from '../../../core/models/cinema.model';
 
@@ -20,7 +22,7 @@ interface SeatLayoutItem extends Seat {
   imports: [CommonModule, RouterModule, FormsModule, NavbarComponent],
   templateUrl: './seat-selection.component.html'
 })
-export class SeatSelectionComponent implements OnInit {
+export class SeatSelectionComponent implements OnInit, OnDestroy {
   screeningId!: number;
   screening: Screening | null = null;
   seatsByRow: { [row: string]: SeatLayoutItem[] } = {};
@@ -30,13 +32,15 @@ export class SeatSelectionComponent implements OnInit {
   submitting = false;
   errorMessage = '';
   loading = true;
+  private wsSubscription?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private screeningService: ScreeningService,
     private bookingService: BookingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private wsService: WebSocketService
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +52,37 @@ export class SeatSelectionComponent implements OnInit {
         this.holderName = `${user.firstName} ${user.lastName}`;
       }
       this.loadScreeningAndSeats();
+      this.listenToLiveSeatUpdates();
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
+    }
+  }
+
+  private listenToLiveSeatUpdates(): void {
+    this.wsSubscription = this.wsService.watchSeats(this.screeningId).subscribe({
+      next: (msg: WsMessage<SeatUpdatePayload>) => {
+        if (!msg.payload) return;
+        const update = msg.payload;
+        const row = this.seatsByRow[update.rowLabel];
+        if (!row) return;
+
+        const targetSeat = row.find(s => s.seatNumber === update.seatNumber || s.id === update.seatId);
+        if (targetSeat) {
+          targetSeat.available = update.available;
+          targetSeat.booked = !update.available;
+          // If the seat was selected by this user but somebody else booked it first:
+          if (!update.available && targetSeat.selected) {
+            targetSeat.selected = false;
+            this.selectedSeats = this.selectedSeats.filter(s => s.id !== targetSeat.id);
+            this.errorMessage = `Seat ${update.rowLabel}${update.seatNumber} was just taken by another user!`;
+          }
+        }
+      }
+    });
   }
 
   loadScreeningAndSeats(): void {

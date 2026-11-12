@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/cinechain}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/cinechain}
     username: ${DATABASE_USERNAME:cinechain}
-    password: ${DATABASE_PASSWORD:cinechain}
+    password: ${DATABASE_PASSWORD:cinechain123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

@@ -1,0 +1,144 @@
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-white">Ticket Validation</h1>
+    <p class="text-gray-400 mt-1">Scan and validate cinema tickets via QR code</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Validation Form -->
+    <div class="space-y-4">
+      <div class="admin-card">
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+          </svg>
+          Validate Ticket
+        </h2>
+
+        <form [formGroup]="validationForm" (ngSubmit)="validate()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">QR Code Data</label>
+            <textarea formControlName="qrCodeData" rows="4"
+                      placeholder="Paste QR code data here or scan with a QR reader..."
+                      class="admin-input resize-none font-mono text-sm"></textarea>
+            @if (validationForm.get('qrCodeData')?.errors?.['required'] && validationForm.get('qrCodeData')?.touched) {
+              <p class="text-red-400 text-sm mt-1">QR code data is required</p>
+            }
+          </div>
+
+          <div class="flex gap-3">
+            <button type="submit" [disabled]="validating || validationForm.invalid"
+                    class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+              @if (validating) {
+                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Validating...
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Validate Ticket
+              }
+            </button>
+            @if (validationResult) {
+              <button type="button" (click)="clearResult()"
+                      class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                Clear
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+
+      <!-- Result Card -->
+      @if (validationResult) {
+        <div [class]="validationResult.success
+          ? 'admin-card border-2 border-green-500/50 bg-green-500/5'
+          : 'admin-card border-2 border-red-500/50 bg-red-500/5'">
+          <div class="flex items-start gap-4">
+            @if (validationResult.success) {
+              <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            } @else {
+              <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            }
+            <div class="flex-1">
+              <h3 [class]="validationResult.success ? 'text-green-400 font-bold text-lg' : 'text-red-400 font-bold text-lg'">
+                {{ validationResult.success ? '✓ Valid Ticket' : '✗ Invalid Ticket' }}
+              </h3>
+              <p class="text-gray-300 mt-1">{{ validationResult.message }}</p>
+              @if (validationResult.ticket) {
+                <div class="mt-4 space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Holder</span>
+                    <span class="text-white font-medium">{{ validationResult.ticket.holderName }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Movie</span>
+                    <span class="text-white">{{ validationResult.ticket.movieTitle }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Screening</span>
+                    <span class="text-white">{{ validationResult.ticket.screeningTime }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Seat</span>
+                    <span class="text-white">{{ validationResult.ticket.seatInfo }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Validation History -->
+    <div class="admin-card">
+      <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Validation History
+      </h2>
+
+      @if (loadingHistory) {
+        <div class="flex justify-center py-8">
+          <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      } @else {
+        <div class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+          @for (record of history; track record.id) {
+            <div class="bg-[#0a0f1e] rounded-lg p-4 border border-[#2a3a6a]">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-white font-medium text-sm">{{ record.holderName }}</div>
+                  <div class="text-gray-400 text-xs mt-1">{{ record.movieTitle }} · {{ record.seatInfo }}</div>
+                  <div class="text-gray-500 text-xs mt-1">{{ record.validatedAt | date:'short' }}</div>
+                </div>
+                <span [class]="record.status === 'SUCCESS' ? 'badge-active' : 'badge-cancelled'">
+                  {{ record.status }}
+                </span>
+              </div>
+            </div>
+          }
+          @empty {
+            <div class="text-center py-8 text-gray-500">
+              <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              <p>No validation records yet</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

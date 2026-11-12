@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { DashboardService, AdminStats } from '../../../core/services/dashboard.service';
 import { BookingService } from '../../../core/services/booking.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 import { Booking } from '../../../core/models/booking.model';
 
 @Component({
@@ -12,19 +14,68 @@ import { Booking } from '../../../core/models/booking.model';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: []
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   stats: AdminStats | null = null;
   recentBookings: Booking[] = [];
   loading = true;
   error: string | null = null;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private dashboardService: DashboardService,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private wsService: WebSocketService
   ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
+    this.setupRealtimeListeners();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  private setupRealtimeListeners(): void {
+    // 1. Listen for new bookings live
+    this.subscriptions.push(
+      this.wsService.bookingEvents$.subscribe({
+        next: (msg) => {
+          if (!msg.payload) return;
+          const ev = msg.payload;
+          const newBooking: Booking = {
+            id: ev.bookingId,
+            bookingReference: ev.bookingReference,
+            customerId: 0,
+            screeningId: 0,
+            customerName: ev.customerName || 'Anonymous',
+            movieTitle: ev.movieTitle || 'Movie',
+            cinemaName: ev.cinemaName || 'Cinema',
+            screeningTime: ev.screeningTime ? ev.screeningTime.toString() : new Date().toISOString(),
+            status: ev.status,
+            totalAmount: ev.totalAmount || 0,
+            createdAt: ev.createdAt ? ev.createdAt.toString() : new Date().toISOString()
+          };
+          this.recentBookings = [newBooking, ...this.recentBookings.slice(0, 4)];
+          // Increment revenue & tickets in stats
+          if (this.stats && ev.status === 'CONFIRMED') {
+            this.stats.ticketsSold += (ev.seatCount || 1);
+            this.stats.totalRevenue = (this.stats.totalRevenue || 0) + (ev.totalAmount || 0);
+          }
+        }
+      })
+    );
+
+    // 2. Listen for dashboard stats broadcast
+    this.subscriptions.push(
+      this.wsService.dashboardStats$.subscribe({
+        next: (msg) => {
+          if (msg.payload) {
+            this.stats = { ...this.stats, ...msg.payload };
+          }
+        }
+      })
+    );
   }
 
   loadDashboardData(): void {

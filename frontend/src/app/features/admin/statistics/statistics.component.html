@@ -1,0 +1,113 @@
+<div class="p-6 space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold text-white">Statistics & Reports</h1>
+    <p class="text-gray-400 mt-1">Platform performance overview</p>
+  </div>
+
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  }
+
+  @if (stats && !loading) {
+    <!-- KPI Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="stat-card text-center">
+        <div class="text-3xl font-bold text-blue-400">{{ stats.totalMovies }}</div>
+        <div class="text-gray-400 text-sm mt-1">Movies</div>
+      </div>
+      <div class="stat-card text-center">
+        <div class="text-3xl font-bold text-purple-400">{{ stats.totalCustomers }}</div>
+        <div class="text-gray-400 text-sm mt-1">Customers</div>
+      </div>
+      <div class="stat-card text-center">
+        <div class="text-3xl font-bold text-green-400">{{ stats.ticketsSold }}</div>
+        <div class="text-gray-400 text-sm mt-1">Tickets Sold</div>
+      </div>
+      <div class="stat-card text-center">
+        <div class="text-3xl font-bold text-amber-400">{{ stats.totalRevenue | currency }}</div>
+        <div class="text-gray-400 text-sm mt-1">Revenue</div>
+      </div>
+    </div>
+
+    <!-- Ticket Distribution -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="admin-card">
+        <h2 class="text-lg font-semibold text-white mb-6">Ticket Status Distribution</h2>
+        <div class="space-y-4">
+          <!-- Active -->
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-400">Active Tickets</span>
+              <span class="text-green-400 font-medium">{{ stats.ticketsSold - stats.usedTickets - stats.cancelledTickets }}</span>
+            </div>
+            <div class="h-2 bg-[#0a0f1e] rounded-full overflow-hidden">
+              <div class="h-full bg-green-500 rounded-full"
+                   [style.width.%]="stats.ticketsSold > 0 ? ((stats.ticketsSold - stats.usedTickets - stats.cancelledTickets) / stats.ticketsSold * 100) : 0"></div>
+            </div>
+          </div>
+          <!-- Used -->
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-400">Used Tickets</span>
+              <span class="text-blue-400 font-medium">{{ stats.usedTickets }}</span>
+            </div>
+            <div class="h-2 bg-[#0a0f1e] rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full"
+                   [style.width.%]="stats.ticketsSold > 0 ? (stats.usedTickets / stats.ticketsSold * 100) : 0"></div>
+            </div>
+          </div>
+          <!-- Cancelled -->
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-400">Cancelled Tickets</span>
+              <span class="text-red-400 font-medium">{{ stats.cancelledTickets }}</span>
+            </div>
+            <div class="h-2 bg-[#0a0f1e] rounded-full overflow-hidden">
+              <div class="h-full bg-red-500 rounded-full"
+                   [style.width.%]="stats.ticketsSold > 0 ? (stats.cancelledTickets / stats.ticketsSold * 100) : 0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Metrics -->
+      <div class="admin-card">
+        <h2 class="text-lg font-semibold text-white mb-6">Platform Metrics</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-[#0a0f1e] rounded-lg">
+            <div class="text-gray-400 text-sm">Validation Rate</div>
+            <div class="flex items-center gap-2">
+              <div class="h-2 w-24 bg-[#2a3a6a] rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full" [style.width.%]="revenueRate"></div>
+              </div>
+              <span class="text-blue-400 font-semibold">{{ revenueRate }}%</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-[#0a0f1e] rounded-lg">
+            <div class="text-gray-400 text-sm">Occupancy Rate</div>
+            <div class="flex items-center gap-2">
+              <div class="h-2 w-24 bg-[#2a3a6a] rounded-full overflow-hidden">
+                <div class="h-full bg-purple-500 rounded-full" [style.width.%]="occupancyRate"></div>
+              </div>
+              <span class="text-purple-400 font-semibold">{{ occupancyRate }}%</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-[#0a0f1e] rounded-lg">
+            <div class="text-gray-400 text-sm">Total Cinemas</div>
+            <span class="text-white font-semibold">{{ stats.totalCinemas }}</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-[#0a0f1e] rounded-lg">
+            <div class="text-gray-400 text-sm">Total Halls</div>
+            <span class="text-white font-semibold">{{ stats.totalHalls }}</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-[#0a0f1e] rounded-lg">
+            <div class="text-gray-400 text-sm">Available Seats</div>
+            <span class="text-green-400 font-semibold">{{ stats.availableSeats }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

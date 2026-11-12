@@ -1,7 +1,11 @@
 package com.cinechain.service;
 
 import com.cinechain.dto.ticket.TicketDto;
+import com.cinechain.dto.websocket.BookingEventPayload;
+import com.cinechain.dto.websocket.NotificationPayload;
+import com.cinechain.dto.websocket.SeatUpdatePayload;
 import com.cinechain.entity.Booking;
+import com.cinechain.entity.Seat;
 import com.cinechain.entity.Ticket;
 import com.cinechain.enums.BookingStatus;
 import com.cinechain.enums.TicketStatus;
@@ -31,6 +35,7 @@ public class TicketService {
     private final BlockchainService blockchainService;
     private final QrCodeService qrCodeService;
     private final ObjectMapper objectMapper;
+    private final WebSocketPublisher wsPublisher;
 
     public List<TicketDto> getMyTickets(Long customerId) {
         return ticketRepository.findByCustomerId(customerId).stream()
@@ -85,6 +90,37 @@ public class TicketService {
         if (allCancelled) {
             booking.setStatus(BookingStatus.CANCELLED);
             bookingRepository.save(booking);
+        }
+
+        // Real-time WebSocket updates
+        try {
+            Seat seat = ticket.getSeat();
+            wsPublisher.publishSeatReleased(SeatUpdatePayload.builder()
+                    .screeningId(booking.getScreening().getId())
+                    .seatId(seat.getId())
+                    .rowLabel(seat.getRowLabel())
+                    .seatNumber(seat.getSeatNumber())
+                    .seatType(seat.getSeatType() != null ? seat.getSeatType().name() : "STANDARD")
+                    .available(true)
+                    .build());
+
+            if (allCancelled) {
+                wsPublisher.publishBookingCancelled(BookingEventPayload.builder()
+                        .bookingId(booking.getId())
+                        .bookingReference(booking.getBookingReference())
+                        .status("CANCELLED")
+                        .build());
+            }
+
+            wsPublisher.notifyCustomer(booking.getCustomer().getId(), NotificationPayload.builder()
+                    .title("Ticket Cancelled")
+                    .body("Your ticket #" + ticket.getId() + " has been successfully cancelled.")
+                    .level(NotificationPayload.Level.INFO)
+                    .actionUrl("/customer/tickets")
+                    .referenceId(ticket.getId())
+                    .build());
+        } catch (Exception ex) {
+            log.warn("Failed to broadcast WebSocket cancellation update: {}", ex.getMessage());
         }
 
         return TicketDto.from(updatedTicket);

@@ -6,12 +6,12 @@ export interface Booking {
   customerId: number;
   customerName?: string;
   customerEmail?: string;
-  screeningId: number;
+  screeningId?: number;
   movieTitle?: string;
   screeningTime?: string;
   cinemaName?: string;
   hallName?: string;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | string;
   totalAmount: number;
   createdAt: string;
   tickets?: Ticket[];

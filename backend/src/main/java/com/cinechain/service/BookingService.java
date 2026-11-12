@@ -3,6 +3,9 @@ package com.cinechain.service;
 import com.cinechain.dto.booking.BookingDto;
 import com.cinechain.dto.booking.BookingRequest;
 import com.cinechain.dto.ticket.TicketSummaryDto;
+import com.cinechain.dto.websocket.BookingEventPayload;
+import com.cinechain.dto.websocket.NotificationPayload;
+import com.cinechain.dto.websocket.SeatUpdatePayload;
 import com.cinechain.entity.*;
 import com.cinechain.enums.BookingStatus;
 import com.cinechain.enums.TicketStatus;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -34,6 +38,7 @@ public class BookingService {
     private final QrCodeService qrCodeService;
     private final BlockchainService blockchainService;
     private final ObjectMapper objectMapper;
+    private final WebSocketPublisher wsPublisher;
 
     @Transactional
     public BookingDto createBooking(BookingRequest request, Long customerId) {
@@ -134,6 +139,48 @@ public class BookingService {
         List<TicketSummaryDto> summaries = savedTickets.stream()
                 .map(TicketSummaryDto::from)
                 .toList();
+
+        // 8. Broadcast real-time events via WebSocket
+        try {
+            // A. Broadcast seat booking updates for this screening
+            for (Seat seat : lockedSeats) {
+                wsPublisher.publishSeatBooked(SeatUpdatePayload.builder()
+                        .screeningId(screening.getId())
+                        .seatId(seat.getId())
+                        .rowLabel(seat.getRowLabel())
+                        .seatNumber(seat.getSeatNumber())
+                        .seatType(seat.getSeatType() != null ? seat.getSeatType().name() : "STANDARD")
+                        .available(false)
+                        .remainingSeats(0) // dynamic on client
+                        .build());
+            }
+
+            // B. Broadcast new booking event to admin channel
+            wsPublisher.publishBookingCreated(BookingEventPayload.builder()
+                    .bookingId(savedBooking.getId())
+                    .bookingReference(savedBooking.getBookingReference())
+                    .customerName(customer.getFirstName() + " " + customer.getLastName())
+                    .customerEmail(customer.getEmail())
+                    .movieTitle(screening.getMovie().getTitle())
+                    .cinemaName(screening.getHall().getCinema().getName())
+                    .screeningTime(screening.getStartTime())
+                    .seatCount(lockedSeats.size())
+                    .totalAmount(totalAmount)
+                    .status(savedBooking.getStatus().name())
+                    .createdAt(LocalDateTime.now())
+                    .build());
+
+            // C. Send personal real-time notification to the customer
+            wsPublisher.notifyCustomer(customer.getId(), NotificationPayload.builder()
+                    .title("Booking Confirmed!")
+                    .body("Your booking " + savedBooking.getBookingReference() + " for " + screening.getMovie().getTitle() + " has been confirmed.")
+                    .level(NotificationPayload.Level.SUCCESS)
+                    .actionUrl("/customer/tickets")
+                    .referenceId(savedBooking.getId())
+                    .build());
+        } catch (Exception ex) {
+            log.warn("Failed to broadcast WebSocket messages for booking {}: {}", savedBooking.getId(), ex.getMessage());
+        }
 
         return BookingDto.from(savedBooking, summaries);
     }

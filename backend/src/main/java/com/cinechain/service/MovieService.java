@@ -20,7 +20,31 @@ public class MovieService {
     private final MovieRepository movieRepository;
 
     public Page<MovieDto> getAllMovies(String status, String genre, String search, Pageable pageable) {
-        Page<Movie> movies = movieRepository.findWithFilters(status, genre, search, pageable);
+        boolean hasStatus = status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL");
+        boolean hasGenre = genre != null && !genre.trim().isEmpty() && !genre.equalsIgnoreCase("ALL");
+        boolean hasSearch = search != null && !search.trim().isEmpty();
+
+        Page<Movie> movies;
+        if (hasSearch) {
+            String query = search.trim();
+            if (hasStatus && hasGenre) {
+                movies = movieRepository.findByStatusAndGenreAndTitleContainingIgnoreCase(status, genre, query, pageable);
+            } else if (hasStatus) {
+                movies = movieRepository.findByStatusAndTitleContainingIgnoreCase(status, query, pageable);
+            } else if (hasGenre) {
+                movies = movieRepository.findByGenreAndTitleContainingIgnoreCase(genre, query, pageable);
+            } else {
+                movies = movieRepository.findByTitleContainingIgnoreCase(query, pageable);
+            }
+        } else if (hasStatus && hasGenre) {
+            movies = movieRepository.findByStatusAndGenre(status, genre, pageable);
+        } else if (hasStatus) {
+            movies = movieRepository.findByStatus(status, pageable);
+        } else if (hasGenre) {
+            movies = movieRepository.findByGenre(genre, pageable);
+        } else {
+            movies = movieRepository.findAll(pageable);
+        }
         return movies.map(MovieDto::from);
     }
 

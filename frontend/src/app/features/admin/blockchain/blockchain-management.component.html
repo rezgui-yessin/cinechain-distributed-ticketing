@@ -1,0 +1,99 @@
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-bold text-white">Blockchain Transactions</h1>
+    <p class="text-gray-400 mt-1">Monitor all on-chain ticket lifecycle events</p>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="stat-card">
+      <div class="text-gray-400 text-sm">Total</div>
+      <div class="text-2xl font-bold text-white mt-1">{{ stats.total }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="text-gray-400 text-sm">Confirmed</div>
+      <div class="text-2xl font-bold text-green-400 mt-1">{{ stats.confirmed }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="text-gray-400 text-sm">Pending</div>
+      <div class="text-2xl font-bold text-yellow-400 mt-1">{{ stats.pending }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="text-gray-400 text-sm">Failed</div>
+      <div class="text-2xl font-bold text-red-400 mt-1">{{ stats.failed }}</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="admin-card">
+    <div class="flex flex-col sm:flex-row gap-4">
+      <div class="flex-1 relative">
+        <input type="text" [(ngModel)]="searchHash" placeholder="Search by transaction hash..."
+               class="admin-input pl-10"/>
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+      </div>
+      <select [(ngModel)]="statusFilter" class="admin-input w-48">
+        <option value="ALL">All Status</option>
+        <option value="CONFIRMED">Confirmed</option>
+        <option value="PENDING">Pending</option>
+        <option value="FAILED">Failed</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table -->
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else {
+    <div class="admin-card overflow-hidden p-0">
+      <table class="w-full text-sm">
+        <thead class="bg-[#0a0f1e] border-b border-[#2a3a6a]">
+          <tr>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Hash</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Type</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Ticket ID</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Block</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Gas</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Status</th>
+            <th class="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase">Date</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#2a3a6a]">
+          @for (tx of filteredTransactions; track tx.id) {
+            <tr class="hover:bg-[#1a2444]/50 transition-colors">
+              <td class="px-6 py-4">
+                <code class="text-blue-400 text-xs font-mono">{{ truncateHash(tx.transactionHash) }}</code>
+              </td>
+              <td class="px-6 py-4">
+                <span [class]="'px-2 py-1 rounded text-xs font-medium ' + typeColor(tx.type)">{{ tx.type }}</span>
+              </td>
+              <td class="px-6 py-4 text-gray-300">#{{ tx.ticketId }}</td>
+              <td class="px-6 py-4 text-gray-400 font-mono">{{ tx.blockNumber | number }}</td>
+              <td class="px-6 py-4 text-gray-400">{{ tx.gasUsed | number }}</td>
+              <td class="px-6 py-4">
+                @if (tx.status === 'CONFIRMED') {
+                  <span class="badge-active">Confirmed</span>
+                } @else if (tx.status === 'PENDING') {
+                  <span class="badge-pending">Pending</span>
+                } @else {
+                  <span class="badge-cancelled">Failed</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-gray-500 text-xs">{{ tx.createdAt | date:'short' }}</td>
+            </tr>
+          }
+          @empty {
+            <tr>
+              <td colspan="7" class="px-6 py-16 text-center text-gray-500">No transactions found</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

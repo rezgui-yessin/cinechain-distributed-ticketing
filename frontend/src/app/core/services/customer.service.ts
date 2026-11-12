@@ -31,4 +31,9 @@ export class CustomerService {
   toggleCustomerStatus(id: number, enabled: boolean): Observable<User> {
     return this.http.patch<User>(`${this.API_URL}/${id}/status`, { enabled });
   }
+
+  // Alias used by component
+  toggleStatus(id: number, enabled: boolean): Observable<User> {
+    return this.toggleCustomerStatus(id, enabled);
+  }
 }
