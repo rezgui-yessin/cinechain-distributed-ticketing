@@ -1,0 +1,187 @@
+<app-navbar></app-navbar>
+
+<main class="min-h-screen bg-[#0a0a1a] text-white">
+  
+  <!-- Hero Section -->
+  <section class="relative min-h-[580px] flex items-center justify-center overflow-hidden border-b border-[#1f1f3a]">
+    <div class="absolute inset-0 bg-hero-gradient opacity-90 z-0"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.12)_0%,transparent_70%)]"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-5xl mx-auto px-4 py-20 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-6 animate-pulse-glow">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+        Next-Gen Cinema Booking Platform
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+        Immersive Movies.<br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500">
+          Decentralized Tickets.
+        </span>
+      </h1>
+
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-gray-400 mb-10">
+        Experience cinematic masterpieces across luxury halls with verifiable blockchain ticketing, instant QR validation, and zero scalping.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a routerLink="/movies" class="btn-primary flex items-center gap-2 px-8 py-3 text-base">
+          <span>Explore Now Showing</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </a>
+        <a routerLink="/cinemas" class="px-6 py-3 rounded-lg border border-[#2a2a4a] bg-[#12122a]/80 hover:bg-[#1a1a3a] text-gray-300 hover:text-white font-medium transition-all text-base">
+          Browse Cinemas
+        </a>
+      </div>
+
+      <!-- Quick Trust Indicators -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-16 max-w-3xl mx-auto pt-8 border-t border-[#1e1e38]">
+        <div>
+          <div class="text-2xl font-bold text-amber-400">100%</div>
+          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Verifiable Tickets</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-blue-400">4K / IMAX</div>
+          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Laser Projection</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-emerald-400">Instant</div>
+          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">QR Code Entry</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-purple-400">0%</div>
+          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Ticket Counterfeiting</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Now Showing Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Now Showing</h2>
+        <p class="text-sm text-gray-400 mt-1">Watch today's most acclaimed movies on the big screen</p>
+      </div>
+      <a routerLink="/movies" class="text-sm font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors">
+        <span>View all</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Movie Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div *ngFor="let movie of nowShowingMovies" class="card group flex flex-col justify-between overflow-hidden p-0 border border-[#2a2a4a] hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300">
+        
+        <!-- Poster Container -->
+        <div class="relative aspect-[2/3] w-full overflow-hidden bg-[#1a1a3a]">
+          <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          
+          <!-- Rating Badge -->
+          <div class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-amber-500/30 text-amber-400 text-xs font-bold flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <span>{{ movie.rating }}</span>
+          </div>
+
+          <!-- Language / Duration Pills -->
+          <div class="absolute bottom-3 left-3 flex gap-2">
+            <span class="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] text-gray-300 font-medium border border-white/10">
+              {{ movie.language }}
+            </span>
+            <span class="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] text-gray-300 font-medium border border-white/10">
+              {{ movie.durationMinutes }}m
+            </span>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <span class="text-xs text-amber-400 font-semibold tracking-wide uppercase">{{ movie.genre }}</span>
+            <h3 class="text-lg font-bold text-white mt-1 group-hover:text-amber-400 transition-colors line-clamp-1">{{ movie.title }}</h3>
+            <p class="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">{{ movie.description }}</p>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-[#1f1f3a] flex items-center justify-between">
+            <a [routerLink]="['/movies', movie.id]" class="text-xs text-gray-400 hover:text-white transition-colors">Details</a>
+            <a [routerLink]="['/movies', movie.id]" class="btn-primary text-xs px-4 py-1.5">
+              Book Tickets
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="bg-[#0d0d20] border-y border-[#1f1f3a] py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">How CineChain Works</h2>
+        <p class="text-sm text-gray-400 mt-2">Book movie tickets seamlessly with decentralized security</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
+          <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
+            <span class="text-lg font-bold">1</span>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Select Movie & Seats</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Choose your favorite movie, cinema hall, and pick your preferred seats with real-time availability.</p>
+        </div>
+
+        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
+          <div class="w-12 h-12 mx-auto rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+            <span class="text-lg font-bold">2</span>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Instant Minting & QR</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Your ticket is recorded on the blockchain ledger, generating a tamper-proof encrypted QR code.</p>
+        </div>
+
+        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
+          <div class="w-12 h-12 mx-auto rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
+            <span class="text-lg font-bold">3</span>
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Fast Scanner Validation</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">Show your QR code at the theater scanner for instant 1-second entry validation. Enjoy the show!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coming Soon Section -->
+  <section *ngIf="comingSoonMovies.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Coming Soon</h2>
+      <p class="text-sm text-gray-400 mt-1">Anticipated blockbusters arriving soon to CineChain theaters</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div *ngFor="let movie of comingSoonMovies" class="card overflow-hidden p-0 border border-[#2a2a4a] opacity-80 hover:opacity-100 transition-opacity">
+        <div class="relative aspect-[2/3] w-full overflow-hidden bg-[#1a1a3a]">
+          <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="px-2 py-1 rounded bg-amber-500 text-black font-bold text-[10px] uppercase">
+              Releasing {{ movie.releaseDate }}
+            </span>
+          </div>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-white">{{ movie.title }}</h3>
+          <p class="text-xs text-gray-400 mt-1">{{ movie.genre }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>

@@ -1,0 +1,107 @@
+<app-navbar></app-navbar>
+
+<div class="min-h-screen bg-[#0a0a1a] text-white pb-20">
+  
+  <!-- Backdrop Banner -->
+  <div *ngIf="movie" class="relative w-full h-[400px] overflow-hidden border-b border-[#2a2a4a]">
+    <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full h-full object-cover blur-md scale-110 opacity-30" />
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] via-[#0a0a1a]/70 to-transparent"></div>
+  </div>
+
+  <!-- Content Container -->
+  <div *ngIf="movie" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-64 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Poster Card -->
+      <div class="md:col-span-1">
+        <div class="rounded-2xl overflow-hidden border border-[#2a2a4a] shadow-2xl bg-[#12122a]">
+          <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full aspect-[2/3] object-cover" />
+        </div>
+
+        <div *ngIf="movie.trailerUrl" class="mt-4">
+          <a [href]="movie.trailerUrl" target="_blank" class="w-full py-3 bg-[#1a1a3a] hover:bg-[#22224d] border border-[#2a2a4a] text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+            <span>Watch Trailer</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Info & Screenings -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
+            {{ movie.status }}
+          </span>
+          <span class="text-sm text-gray-400 font-medium">{{ movie.genre }}</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-4">{{ movie.title }}</h1>
+
+        <!-- Stats Bar -->
+        <div class="flex flex-wrap items-center gap-6 py-4 border-y border-[#1f1f3a] text-sm text-gray-300 mb-6">
+          <div class="flex items-center gap-1.5 text-amber-400 font-bold">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            <span>{{ movie.rating }} / 10</span>
+          </div>
+          <div>Duration: <strong class="text-white">{{ movie.durationMinutes }} mins</strong></div>
+          <div>Language: <strong class="text-white">{{ movie.language }}</strong></div>
+          <div>Release: <strong class="text-white">{{ movie.releaseDate }}</strong></div>
+        </div>
+
+        <!-- Synopsis -->
+        <div class="mb-8">
+          <h3 class="text-sm uppercase tracking-wider text-gray-400 font-semibold mb-2">Synopsis</h3>
+          <p class="text-gray-300 leading-relaxed text-sm sm:text-base">{{ movie.description }}</p>
+        </div>
+
+        <!-- Available Screenings Section -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-white tracking-tight">Available Screenings</h2>
+            <span class="text-xs text-gray-400">Select a showtime to choose seats</span>
+          </div>
+
+          <div *ngIf="screenings.length === 0" class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center text-gray-400 text-sm">
+            No scheduled screenings for this movie currently. Check back soon!
+          </div>
+
+          <div class="space-y-4">
+            <div *ngFor="let s of screenings" class="card bg-[#12122a] border border-[#2a2a4a] hover:border-amber-500/40 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-all">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-lg text-white">{{ s.startTime | date:'shortTime' }}</span>
+                  <span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
+                    {{ s.hallName }}
+                  </span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">
+                  {{ s.cinemaName }} &bull; Date: {{ s.startTime | date:'mediumDate' }}
+                </div>
+                <div class="text-xs text-emerald-400 mt-1 font-medium">
+                  {{ s.availableSeats }} of {{ s.totalSeats }} seats available
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between sm:justify-end gap-4">
+                <div class="text-right">
+                  <span class="text-xs text-gray-400 block">Ticket Price</span>
+                  <span class="text-lg font-bold text-amber-400">${{ s.price | number:'1.2-2' }}</span>
+                </div>
+                <button (click)="bookScreening(s.id)" class="btn-primary text-xs px-5 py-2.5">
+                  Select Seats
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,426 @@
+<div class="space-y-8 animate-fade-in">
+  <!-- Welcome Banner -->
+  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600/20 via-[#12122a] to-blue-900/20 border border-amber-500/30 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+    <!-- Ambient background glow -->
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-2 max-w-xl">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>Decentralized Ticket Pass &bull; Web3 Verified</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          {{ getGreetingTime() }}, <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200">{{ currentUser?.firstName || 'Movie Enthusiast' }}</span>!
+        </h1>
+        <p class="text-sm text-gray-400 leading-relaxed">
+          Welcome to your CineChain member cockpit. Track your live tickets, view cryptographic proof, and discover the newest cinema blockbusters in stunning laser IMAX.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a 
+          routerLink="/customer/movies" 
+          class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-950 font-bold text-xs shadow-lg shadow-amber-500/25 transition transform active:scale-95">
+          <svg class="w-4 h-4 text-gray-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          <span>Explore Movies</span>
+        </a>
+        <a 
+          routerLink="/customer/tickets" 
+          class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#0d0d20] hover:bg-gray-800 text-gray-200 border border-gray-700/80 font-semibold text-xs transition">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+          </svg>
+          <span>My Tickets</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Row (4 Cards) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Stat 1: Total Bookings -->
+    <div class="p-5 rounded-2xl bg-[#12122a] border border-gray-800/80 hover:border-amber-500/40 transition-all duration-200 flex items-center justify-between shadow-lg">
+      <div class="space-y-1">
+        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Bookings</p>
+        <p class="text-2xl font-bold text-white font-mono">{{ loadingStats ? '...' : stats.totalBookings }}</p>
+        <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Lifetime orders
+        </span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Stat 2: Active Tickets -->
+    <div class="p-5 rounded-2xl bg-[#12122a] border border-amber-500/30 hover:border-amber-400 transition-all duration-200 flex items-center justify-between shadow-lg relative overflow-hidden">
+      <div class="absolute -right-2 -bottom-2 w-16 h-16 bg-amber-500/10 rounded-full blur-xl"></div>
+      <div class="space-y-1 z-10">
+        <p class="text-xs font-medium text-amber-300 uppercase tracking-wider">Active Tickets</p>
+        <p class="text-2xl font-bold text-amber-400 font-mono">{{ loadingStats ? '...' : stats.activeTickets }}</p>
+        <span class="text-[11px] text-amber-200/80 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          Ready for entry
+        </span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center z-10">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Stat 3: Upcoming Screenings -->
+    <div class="p-5 rounded-2xl bg-[#12122a] border border-gray-800/80 hover:border-amber-500/40 transition-all duration-200 flex items-center justify-between shadow-lg">
+      <div class="space-y-1">
+        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Upcoming Shows</p>
+        <p class="text-2xl font-bold text-white font-mono">{{ loadingStats ? '...' : stats.upcomingScreenings }}</p>
+        <span class="text-[11px] text-gray-400">Next 7 days</span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Stat 4: Used / Loyalty Points -->
+    <div class="p-5 rounded-2xl bg-[#12122a] border border-gray-800/80 hover:border-amber-500/40 transition-all duration-200 flex items-center justify-between shadow-lg">
+      <div class="space-y-1">
+        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">CinePoints VIP</p>
+        <p class="text-2xl font-bold text-amber-300 font-mono">1,240</p>
+        <span class="text-[11px] text-amber-400/80">Gold Tier status</span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Tickets Section with QR Codes -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-2.5 h-6 bg-amber-500 rounded-full"></div>
+        <h2 class="text-lg font-bold text-white tracking-tight">Active Passes & QR Codes</h2>
+      </div>
+      <a routerLink="/customer/tickets" class="text-xs text-amber-400 hover:text-amber-300 font-medium transition flex items-center gap-1">
+        <span>Manage all tickets</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div *ngIf="loadingTickets" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div *ngFor="let i of [1,2,3]" class="p-5 rounded-2xl bg-[#12122a] border border-gray-800 animate-pulse h-48"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loadingTickets && upcomingTickets.length === 0" class="p-8 rounded-2xl bg-[#12122a] border border-gray-800 text-center space-y-3">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center text-xl">
+        🎟️
+      </div>
+      <h3 class="text-sm font-semibold text-white">No active tickets right now</h3>
+      <p class="text-xs text-gray-400 max-w-sm mx-auto">Browse current movies and reserve your front-row seat with instant blockchain ticket issuance.</p>
+      <a routerLink="/customer/movies" class="inline-block px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+        Book Your Next Screening
+      </a>
+    </div>
+
+    <!-- Tickets Cards Grid -->
+    <div *ngIf="!loadingTickets && upcomingTickets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div 
+        *ngFor="let ticket of upcomingTickets" 
+        class="group relative rounded-2xl bg-gradient-to-b from-[#161636] to-[#0f0f24] border border-gray-800 hover:border-amber-500/50 p-5 shadow-xl transition-all duration-200 flex flex-col justify-between">
+        
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <span class="inline-block text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+              {{ ticket.cinemaName || 'CineChain Theatre' }}
+            </span>
+            <h3 class="text-base font-bold text-white mt-1 group-hover:text-amber-300 transition line-clamp-1">
+              {{ ticket.movieTitle || 'Screening Movie' }}
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5 flex items-center gap-1.5">
+              <span>🏛️ {{ ticket.hallName || 'Main Hall' }}</span>
+              <span>&bull;</span>
+              <span class="text-amber-300 font-mono font-semibold">{{ formatSeat(ticket) }}</span>
+            </p>
+          </div>
+          
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            ACTIVE
+          </span>
+        </div>
+
+        <!-- Middle: Time & Passenger -->
+        <div class="my-4 py-3 border-y border-gray-800/80 flex items-center justify-between text-xs text-gray-300">
+          <div>
+            <span class="text-[10px] text-gray-500 block uppercase">Showtime</span>
+            <span class="font-medium text-white">{{ formatDate(ticket.screeningTime) }}</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-gray-500 block uppercase">Holder</span>
+            <span class="font-medium text-gray-200 truncate max-w-[120px] inline-block">{{ ticket.holderName || currentUser?.firstName }}</span>
+          </div>
+        </div>
+
+        <!-- Bottom: QR Code Graphic & Action -->
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <!-- QR Code Preview Box -->
+          <div 
+            (click)="openQrModal(ticket)"
+            class="flex items-center space-x-2.5 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition flex-1">
+            <div class="w-9 h-9 bg-white p-1 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+              <img 
+                *ngIf="ticket.qrCode" 
+                [src]="ticket.qrCode" 
+                alt="QR Code" 
+                class="w-full h-full object-contain"
+              />
+              <svg *ngIf="!ticket.qrCode" class="w-full h-full text-black" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h2v2h-2v-2zm-4 0h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 0h2v2h-2v-2zm-6-4h2v2h-2v-2z"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold text-white">Click for QR Pass</p>
+              <p class="text-[10px] text-gray-400 font-mono truncate">ID: #{{ ticket.id }}</p>
+            </div>
+          </div>
+
+          <!-- Quick Expand Button -->
+          <button 
+            type="button" 
+            (click)="openQrModal(ticket)"
+            class="p-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold transition shadow-sm"
+            title="Scan at turnstile">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Now Showing Movies Showcase Grid -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-2.5 h-6 bg-amber-500 rounded-full"></div>
+        <h2 class="text-lg font-bold text-white tracking-tight">Now Showing at CineChain</h2>
+      </div>
+      <a routerLink="/customer/movies" class="text-xs text-amber-400 hover:text-amber-300 font-medium transition flex items-center gap-1">
+        <span>View full catalog</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <!-- Movie Cards Grid -->
+    <div *ngIf="loadingMovies" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div *ngFor="let i of [1,2,3,4,5,6]" class="rounded-xl bg-[#12122a] border border-gray-800 animate-pulse h-64"></div>
+    </div>
+
+    <div *ngIf="!loadingMovies && nowShowingMovies.length === 0" class="p-6 rounded-xl bg-[#12122a] border border-gray-800 text-center text-xs text-gray-400">
+      No featured movies scheduled right now. Check back shortly!
+    </div>
+
+    <div *ngIf="!loadingMovies && nowShowingMovies.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div 
+        *ngFor="let movie of nowShowingMovies" 
+        class="group relative rounded-xl bg-[#12122a] border border-gray-800/80 hover:border-amber-500/50 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between">
+        
+        <!-- Poster & Overlay -->
+        <div class="relative aspect-[2/3] bg-gray-900 overflow-hidden">
+          <img 
+            [src]="movie.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80'" 
+            [alt]="movie.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+          <!-- Rating badge -->
+          <div class="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1">
+            <span>★</span>
+            <span>{{ movie.rating | number:'1.1-1' }}</span>
+          </div>
+
+          <!-- Duration Pill -->
+          <div class="absolute bottom-2 left-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] text-gray-300">
+            {{ movie.durationMinutes }}m
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="p-3 flex-1 flex flex-col justify-between space-y-2">
+          <div>
+            <h4 class="text-xs font-bold text-white group-hover:text-amber-400 transition truncate" [title]="movie.title">
+              {{ movie.title }}
+            </h4>
+            <p class="text-[10px] text-gray-400 truncate">{{ movie.genre }}</p>
+          </div>
+
+          <!-- Quick Book CTA -->
+          <a 
+            [routerLink]="['/customer/movies']"
+            [queryParams]="{ search: movie.title }"
+            class="w-full text-center py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-gray-950 border border-amber-500/30 font-bold text-[11px] transition">
+            Book Show
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings Table / Card list -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-2.5 h-6 bg-amber-500 rounded-full"></div>
+        <h2 class="text-lg font-bold text-white tracking-tight">Recent Orders & Transactions</h2>
+      </div>
+      <a routerLink="/customer/tickets" class="text-xs text-amber-400 hover:text-amber-300 font-medium transition flex items-center gap-1">
+        <span>Full history</span>
+        <span>&rarr;</span>
+      </a>
+    </div>
+
+    <div class="rounded-2xl bg-[#12122a] border border-gray-800 overflow-hidden shadow-xl">
+      <!-- Loading skeleton -->
+      <div *ngIf="loadingBookings" class="p-6 space-y-3">
+        <div *ngFor="let i of [1,2,3]" class="h-10 bg-gray-800/40 rounded-xl animate-pulse"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loadingBookings && recentBookings.length === 0" class="p-8 text-center text-xs text-gray-400">
+        No recent bookings found. Select a movie above to experience CineChain!
+      </div>
+
+      <!-- Table View -->
+      <div *ngIf="!loadingBookings && recentBookings.length > 0" class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-[#0d0d20] text-gray-400 uppercase tracking-wider text-[10px] border-b border-gray-800">
+            <tr>
+              <th class="px-5 py-3 font-semibold">Reference</th>
+              <th class="px-5 py-3 font-semibold">Movie / Screening</th>
+              <th class="px-5 py-3 font-semibold">Date</th>
+              <th class="px-5 py-3 font-semibold">Total</th>
+              <th class="px-5 py-3 font-semibold">Status</th>
+              <th class="px-5 py-3 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800/60 text-gray-300">
+            <tr *ngFor="let booking of recentBookings" class="hover:bg-gray-800/30 transition">
+              <td class="px-5 py-3 font-mono text-amber-300 font-semibold">
+                {{ booking.bookingReference || ('BK-' + booking.id) }}
+              </td>
+              <td class="px-5 py-3">
+                <span class="font-medium text-white">{{ booking.movieTitle || 'Film Screening' }}</span>
+                <span class="block text-[10px] text-gray-400">{{ booking.cinemaName || 'CineChain Theatre' }}</span>
+              </td>
+              <td class="px-5 py-3 text-gray-400">
+                {{ formatDate(booking.createdAt) }}
+              </td>
+              <td class="px-5 py-3 font-mono font-semibold text-white">
+                ${{ booking.totalAmount | number:'1.2-2' }}
+              </td>
+              <td class="px-5 py-3">
+                <span 
+                  class="px-2 py-0.5 rounded text-[10px] font-bold"
+                  [ngClass]="{
+                    'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30': booking.status === 'CONFIRMED',
+                    'bg-amber-500/15 text-amber-300 border border-amber-500/30': booking.status === 'PENDING',
+                    'bg-rose-500/15 text-rose-300 border border-rose-500/30': booking.status === 'CANCELLED'
+                  }">
+                  {{ booking.status }}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-right">
+                <a 
+                  routerLink="/customer/tickets" 
+                  class="text-xs text-amber-400 hover:text-amber-300 font-medium transition">
+                  View Tickets &rarr;
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick QR Code Modal -->
+  <div 
+    *ngIf="selectedQrTicket" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div class="bg-[#12122a] border border-amber-500/40 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center">
+      <!-- Close button -->
+      <button 
+        type="button" 
+        (click)="closeQrModal()" 
+        class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Modal Content -->
+      <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold uppercase tracking-wider mb-2">
+        CineChain Digital Pass
+      </div>
+      <h3 class="text-lg font-bold text-white">{{ selectedQrTicket.movieTitle }}</h3>
+      <p class="text-xs text-gray-400 mt-1">{{ selectedQrTicket.cinemaName }} &bull; {{ selectedQrTicket.hallName }}</p>
+
+      <!-- Large QR Code Box -->
+      <div class="my-6 p-4 bg-white rounded-2xl shadow-inner inline-block">
+        <img 
+          *ngIf="selectedQrTicket.qrCode" 
+          [src]="selectedQrTicket.qrCode" 
+          alt="Ticket QR Code" 
+          class="w-48 h-48 object-contain"
+        />
+        <div *ngIf="!selectedQrTicket.qrCode" class="w-48 h-48 flex flex-col items-center justify-center text-gray-900">
+          <svg class="w-40 h-40 text-black" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h2v2h-2v-2zm-4 0h2v2h-2v-2zm2 2h2v2h-2v-2zm-2 2h2v2h-2v-2zm4 0h2v2h-2v-2zm-6-4h2v2h-2v-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="space-y-1.5 text-xs text-gray-300 bg-[#0d0d20] p-3 rounded-xl border border-gray-800">
+        <div class="flex justify-between">
+          <span class="text-gray-400">Seat:</span>
+          <span class="font-bold text-amber-400">{{ formatSeat(selectedQrTicket) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Showtime:</span>
+          <span class="font-medium text-white">{{ formatDate(selectedQrTicket.screeningTime) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">Pass Holder:</span>
+          <span class="font-medium text-white">{{ selectedQrTicket.holderName }}</span>
+        </div>
+        <div class="pt-2 border-t border-gray-800/80 text-[10px] text-gray-400 font-mono break-all">
+          Hash: {{ selectedQrTicket.qrCodeData || ('0x' + selectedQrTicket.id + '9f7a8b...') }}
+        </div>
+      </div>
+
+      <button 
+        type="button" 
+        (click)="closeQrModal()"
+        class="w-full mt-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+        Done
+      </button>
+    </div>
+  </div>
+</div>

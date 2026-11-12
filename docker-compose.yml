@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cinechain-postgres
+    environment:
+      POSTGRES_DB: cinechain
+      POSTGRES_USER: cinechain
+      POSTGRES_PASSWORD: cinechain123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cinechain-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cinechain -d cinechain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cinechain-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cinechain-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cinechain-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/cinechain
+      DATABASE_USERNAME: cinechain
+      DATABASE_PASSWORD: cinechain123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: cinechain-super-secret-jwt-key-at-least-256-bits-for-hs256-algorithm-security
+      ADMIN_EMAIL: admin@cinechain.com
+      ADMIN_PASSWORD: Admin@CineChain2024!
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cinechain-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cinechain-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - cinechain-network
+    restart: unless-stopped
+
+networks:
+  cinechain-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

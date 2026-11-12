@@ -1,0 +1,35 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+
+# Angular
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Java / Spring Boot
+target/
+*.class
+*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Blockchain
+blockchain/artifacts/
+blockchain/cache/
+blockchain/node_modules/

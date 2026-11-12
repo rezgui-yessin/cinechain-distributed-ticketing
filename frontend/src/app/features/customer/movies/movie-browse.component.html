@@ -1,0 +1,335 @@
+<div class="space-y-6 animate-fade-in">
+  <!-- Header / Filter Bar -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#12122a] p-5 rounded-2xl border border-gray-800 shadow-xl">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+        <span>🎬</span> Browse Feature Films
+      </h1>
+      <p class="text-xs text-gray-400 mt-1">
+        Experience cinema in IMAX 3D, Dolby Atmos, and 4DX with decentralized booking
+      </p>
+    </div>
+
+    <!-- Search & Sort Row -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Search -->
+      <div class="relative min-w-[220px]">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="applyLocalFiltersAndSorting()"
+          (keyup.enter)="fetchMovies()"
+          placeholder="Search by title, actor, or genre..."
+          class="w-full bg-[#0d0d20] border border-gray-700/80 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 transition"
+        />
+        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <button 
+          *ngIf="searchQuery"
+          (click)="searchQuery = ''; fetchMovies()"
+          class="absolute right-2.5 top-2.5 text-gray-500 hover:text-white">
+          &times;
+        </button>
+      </div>
+
+      <!-- Status Toggle -->
+      <div class="inline-flex rounded-xl bg-[#0d0d20] p-1 border border-gray-800 text-xs">
+        <button 
+          type="button"
+          (click)="setStatus('ALL')"
+          [class.bg-amber-500]="selectedStatus === 'ALL'"
+          [class.text-gray-950]="selectedStatus === 'ALL'"
+          [class.font-bold]="selectedStatus === 'ALL'"
+          [class.text-gray-400]="selectedStatus !== 'ALL'"
+          class="px-3 py-1.5 rounded-lg transition">
+          All
+        </button>
+        <button 
+          type="button"
+          (click)="setStatus('NOW_SHOWING')"
+          [class.bg-amber-500]="selectedStatus === 'NOW_SHOWING'"
+          [class.text-gray-950]="selectedStatus === 'NOW_SHOWING'"
+          [class.font-bold]="selectedStatus === 'NOW_SHOWING'"
+          [class.text-gray-400]="selectedStatus !== 'NOW_SHOWING'"
+          class="px-3 py-1.5 rounded-lg transition">
+          Now Showing
+        </button>
+        <button 
+          type="button"
+          (click)="setStatus('COMING_SOON')"
+          [class.bg-amber-500]="selectedStatus === 'COMING_SOON'"
+          [class.text-gray-950]="selectedStatus === 'COMING_SOON'"
+          [class.font-bold]="selectedStatus === 'COMING_SOON'"
+          [class.text-gray-400]="selectedStatus !== 'COMING_SOON'"
+          class="px-3 py-1.5 rounded-lg transition">
+          Coming Soon
+        </button>
+      </div>
+
+      <!-- Sort Dropdown -->
+      <select
+        [(ngModel)]="selectedSort"
+        (change)="applyLocalFiltersAndSorting()"
+        class="bg-[#0d0d20] border border-gray-700/80 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-amber-500 transition">
+        <option value="rating">Sort: Highest Rated</option>
+        <option value="releaseDate">Sort: Newest Releases</option>
+        <option value="title">Sort: Title (A-Z)</option>
+        <option value="duration">Sort: Longest Runtime</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Genre Pills -->
+  <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin">
+    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wider pr-1">Genre:</span>
+    <button
+      *ngFor="let g of genres"
+      type="button"
+      (click)="setGenre(g)"
+      [class.bg-amber-500]="selectedGenre === g"
+      [class.text-gray-950]="selectedGenre === g"
+      [class.font-bold]="selectedGenre === g"
+      [class.shadow-md]="selectedGenre === g"
+      [class.bg-[#12122a]]="selectedGenre !== g"
+      [class.text-gray-300]="selectedGenre !== g"
+      [class.border-gray-800]="selectedGenre !== g"
+      class="px-3.5 py-1.5 rounded-full text-xs border border-transparent hover:border-amber-500/40 transition whitespace-nowrap">
+      {{ g === 'ALL' ? 'All Genres' : g }}
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="h-96 rounded-2xl bg-[#12122a] border border-gray-800 animate-pulse"></div>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="!loading && errorMessage" class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex justify-between items-center">
+    <span>{{ errorMessage }}</span>
+    <button (click)="fetchMovies()" class="underline font-bold">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredMovies.length === 0" class="p-12 text-center rounded-2xl bg-[#12122a] border border-gray-800 space-y-3">
+    <div class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center text-3xl">
+      🎬
+    </div>
+    <h3 class="text-base font-bold text-white">No movies match your criteria</h3>
+    <p class="text-xs text-gray-400 max-w-md mx-auto">Try resetting your genre filters or search query to explore the full CineChain theatrical lineup.</p>
+    <button 
+      (click)="resetFilters()"
+      class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+      Reset All Filters
+    </button>
+  </div>
+
+  <!-- Movie Cards Grid -->
+  <div *ngIf="!loading && filteredMovies.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div 
+      *ngFor="let movie of filteredMovies"
+      class="group rounded-2xl bg-[#12122a] border border-gray-800/80 hover:border-amber-500/50 overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col justify-between">
+      
+      <!-- Poster Container -->
+      <div class="relative aspect-[2/3] overflow-hidden bg-gray-900">
+        <img 
+          [src]="movie.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80'" 
+          [alt]="movie.title"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+
+        <!-- Top Badges -->
+        <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+          <span 
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider backdrop-blur-md"
+            [ngClass]="{
+              'bg-emerald-500/80 text-white': movie.status === 'NOW_SHOWING',
+              'bg-blue-600/80 text-white': movie.status === 'COMING_SOON',
+              'bg-gray-600/80 text-white': movie.status === 'ARCHIVED'
+            }">
+            {{ movie.status === 'NOW_SHOWING' ? 'Now Showing' : 'Coming Soon' }}
+          </span>
+
+          <span class="px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-[11px] font-bold text-amber-400 border border-amber-500/30 flex items-center gap-1">
+            <span>★</span>
+            <span>{{ movie.rating | number:'1.1-1' }}</span>
+          </span>
+        </div>
+
+        <!-- Bottom Details Gradient Overlay -->
+        <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black via-black/70 to-transparent flex items-center justify-between text-[11px] text-gray-300 font-medium">
+          <span>⏱️ {{ movie.durationMinutes }} mins</span>
+          <span class="px-2 py-0.5 rounded bg-white/10 text-white uppercase text-[10px]">{{ movie.language || 'EN' }}</span>
+        </div>
+      </div>
+
+      <!-- Movie Meta & Content -->
+      <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+        <div>
+          <div class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">
+            {{ movie.genre }}
+          </div>
+          <h2 class="text-base font-bold text-white group-hover:text-amber-300 transition line-clamp-1 mt-0.5" [title]="movie.title">
+            {{ movie.title }}
+          </h2>
+          <p class="text-xs text-gray-400 line-clamp-2 mt-1 leading-relaxed">
+            {{ movie.description }}
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-2 border-t border-gray-800/80 space-y-2">
+          <div class="flex items-center gap-2">
+            <!-- Screenings & Booking CTA -->
+            <button
+              type="button"
+              (click)="openScreeningsModal(movie)"
+              class="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs text-center transition shadow-md shadow-amber-500/20">
+              Book Tickets
+            </button>
+            
+            <!-- Trailer CTA -->
+            <button
+              type="button"
+              (click)="openTrailerModal(movie)"
+              class="p-2 rounded-xl bg-[#0d0d20] hover:bg-gray-800 border border-gray-700 text-amber-400 transition"
+              title="Watch Trailer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </button>
+          </div>
+
+          <a 
+            [routerLink]="['/movies', movie.id]"
+            class="block text-center text-[11px] text-gray-400 hover:text-amber-400 transition py-0.5">
+            Full Synopsis & Details &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screenings & Showtimes Modal -->
+  <div 
+    *ngIf="selectedMovieForScreenings"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div class="bg-[#12122a] border border-amber-500/40 rounded-3xl max-w-xl w-full p-6 shadow-2xl relative">
+      <!-- Close button -->
+      <button 
+        type="button"
+        (click)="closeScreeningsModal()" 
+        class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Header -->
+      <div class="flex items-center space-x-3 mb-5">
+        <img 
+          [src]="selectedMovieForScreenings.posterUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80'" 
+          [alt]="selectedMovieForScreenings.title"
+          class="w-12 h-16 object-cover rounded-lg shadow"
+        />
+        <div>
+          <span class="text-[10px] text-amber-400 uppercase font-bold tracking-wider">Available Showtimes</span>
+          <h3 class="text-base font-bold text-white">{{ selectedMovieForScreenings.title }}</h3>
+          <p class="text-xs text-gray-400">{{ selectedMovieForScreenings.genre }} &bull; {{ selectedMovieForScreenings.durationMinutes }} mins</p>
+        </div>
+      </div>
+
+      <!-- Loading showtimes -->
+      <div *ngIf="loadingScreenings" class="py-8 text-center text-xs text-gray-400">
+        <div class="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        Finding available theatres and halls...
+      </div>
+
+      <!-- No showtimes -->
+      <div *ngIf="!loadingScreenings && movieScreenings.length === 0" class="py-8 text-center text-xs text-gray-400 bg-[#0d0d20] rounded-2xl border border-gray-800">
+        <p class="font-semibold text-white">No active screenings scheduled for today.</p>
+        <p class="mt-1 text-gray-400">Check upcoming screening schedules or select another cinema.</p>
+      </div>
+
+      <!-- Showtimes list -->
+      <div *ngIf="!loadingScreenings && movieScreenings.length > 0" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+        <div 
+          *ngFor="let sc of movieScreenings"
+          class="p-3.5 bg-[#0d0d20] border border-gray-800 hover:border-amber-500/40 rounded-2xl flex items-center justify-between transition">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-bold text-amber-400">{{ formatDate(sc.startTime) }}</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-300">{{ sc.hallName || 'Hall' }}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">{{ sc.cinemaName || 'CineChain Multiplex' }}</p>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <span class="text-sm font-bold font-mono text-white">${{ sc.price | number:'1.2-2' }}</span>
+            <a 
+              [routerLink]="['/book', sc.id]"
+              (click)="closeScreeningsModal()"
+              class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+              Select Seats
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end">
+        <button 
+          type="button"
+          (click)="closeScreeningsModal()"
+          class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trailer Modal -->
+  <div 
+    *ngIf="selectedTrailerMovie"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div class="bg-[#12122a] border border-gray-800 rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative text-center">
+      <button 
+        type="button"
+        (click)="closeTrailerModal()" 
+        class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <h3 class="text-lg font-bold text-white mb-2">{{ selectedTrailerMovie.title }} - Official Trailer</h3>
+      <p class="text-xs text-gray-400 mb-6">Enjoy a glimpse of the cinematic action before reserving your seats.</p>
+
+      <div class="aspect-video bg-black rounded-2xl flex items-center justify-center border border-gray-800 overflow-hidden relative shadow-inner">
+        <div class="space-y-3 text-center p-6">
+          <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center text-2xl">
+            ▶
+          </div>
+          <p class="text-sm font-semibold text-white">Trailer Stream Ready</p>
+          <p class="text-xs text-gray-400 font-mono">{{ selectedTrailerMovie.trailerUrl || 'https://www.youtube.com/watch?v=cinechain-official' }}</p>
+          <a 
+            [href]="selectedTrailerMovie.trailerUrl || 'https://www.youtube.com'" 
+            target="_blank" 
+            class="inline-block px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs transition">
+            Watch on External Player
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button 
+          type="button"
+          (click)="closeTrailerModal()"
+          class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-white transition">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
