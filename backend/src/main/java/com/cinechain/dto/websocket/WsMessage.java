@@ -35,6 +35,10 @@ public class WsMessage<T> {
         // Dashboard / stats
         STATS_UPDATE,
 
+        // Concessions / Snack Orders
+        CONCESSION_ORDER_CREATED,
+        CONCESSION_ORDER_UPDATED,
+
         // Customer notification
         NOTIFICATION,
 

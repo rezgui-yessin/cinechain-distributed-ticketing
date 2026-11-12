@@ -22,6 +22,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/cinemas/cinema-list.component').then(m => m.CinemaListComponent)
   },
   {
+    path: 'concessions',
+    loadComponent: () => import('./features/customer/concessions/in-seat-concessions.component').then(m => m.InSeatConcessionsComponent)
+  },
+  {
     path: 'book/:screeningId',
     loadComponent: () => import('./features/booking/seat-selection/seat-selection.component').then(m => m.SeatSelectionComponent)
   },
@@ -88,6 +92,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/scanner/staff-scanner.component').then(m => m.StaffScannerComponent)
       },
       {
+        path: 'concessions',
+        loadComponent: () => import('./features/admin/concessions/kitchen-display.component').then(m => m.KitchenDisplayComponent)
+      },
+      {
         path: 'blockchain',
         loadComponent: () => import('./features/admin/blockchain/blockchain-management.component').then(m => m.BlockchainManagementComponent)
       },
@@ -124,6 +132,10 @@ export const routes: Routes = [
       {
         path: 'tickets/:id',
         loadComponent: () => import('./features/customer/tickets/my-tickets.component').then(m => m.MyTicketsComponent)
+      },
+      {
+        path: 'concessions',
+        loadComponent: () => import('./features/customer/concessions/in-seat-concessions.component').then(m => m.InSeatConcessionsComponent)
       },
       {
         path: 'bookings',

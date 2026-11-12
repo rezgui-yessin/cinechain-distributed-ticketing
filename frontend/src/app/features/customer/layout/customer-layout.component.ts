@@ -59,6 +59,12 @@ export class CustomerLayoutComponent implements OnInit, OnDestroy {
       badge: 'Live'
     },
     {
+      name: 'In-Seat Snacks',
+      icon: 'sparkles',
+      route: '/customer/concessions',
+      badge: 'VIP'
+    },
+    {
       name: 'Booking History',
       icon: 'calendar',
       route: '/customer/bookings'

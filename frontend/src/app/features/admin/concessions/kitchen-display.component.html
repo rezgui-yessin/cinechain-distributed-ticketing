@@ -1,0 +1,188 @@
+<div class="p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+        Live Kitchen Display System (KDS)
+      </div>
+      <h1 class="text-2xl font-bold text-white">In-Seat Concession Orders</h1>
+      <p class="text-gray-400 text-sm mt-1">Real-time incoming food & beverage orders dispatched to cinema halls and seats</p>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <!-- Audio Toggle -->
+      <button (click)="audioEnabled = !audioEnabled"
+              [ngClass]="audioEnabled ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-[#181836] text-gray-500 border-[#2a2a54]'"
+              class="px-3 py-2 rounded-xl border text-xs font-medium flex items-center gap-2 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          @if (audioEnabled) {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+          }
+        </svg>
+        <span>Chime: {{ audioEnabled ? 'ON' : 'OFF' }}</span>
+      </button>
+
+      <!-- Refresh -->
+      <button (click)="loadOrders()" class="p-2 rounded-xl bg-[#181836] hover:bg-[#22224d] text-gray-300 border border-[#2d2d5c] transition-colors" title="Refresh">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs / Stat Counters -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <button (click)="statusFilter = 'ALL'"
+            [ngClass]="statusFilter === 'ALL' ? 'border-amber-500 bg-amber-500/10' : 'border-[#202046] bg-[#101026] hover:bg-[#161634]'"
+            class="p-4 rounded-xl border text-left transition-all">
+      <div class="text-xs uppercase font-semibold text-gray-400">Total Orders</div>
+      <div class="text-2xl font-bold text-white mt-1">{{ orders.length }}</div>
+    </button>
+
+    <button (click)="statusFilter = 'PENDING'"
+            [ngClass]="statusFilter === 'PENDING' ? 'border-amber-500 bg-amber-500/10' : 'border-[#202046] bg-[#101026] hover:bg-[#161634]'"
+            class="p-4 rounded-xl border text-left transition-all">
+      <div class="text-xs uppercase font-semibold text-amber-400 flex items-center justify-between">
+        <span>Pending</span>
+        @if (pendingCount > 0) {
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+        }
+      </div>
+      <div class="text-2xl font-bold text-amber-400 mt-1">{{ pendingCount }}</div>
+    </button>
+
+    <button (click)="statusFilter = 'PREPARING'"
+            [ngClass]="statusFilter === 'PREPARING' ? 'border-blue-500 bg-blue-500/10' : 'border-[#202046] bg-[#101026] hover:bg-[#161634]'"
+            class="p-4 rounded-xl border text-left transition-all">
+      <div class="text-xs uppercase font-semibold text-blue-400">Preparing</div>
+      <div class="text-2xl font-bold text-blue-400 mt-1">{{ preparingCount }}</div>
+    </button>
+
+    <button (click)="statusFilter = 'DELIVERED'"
+            [ngClass]="statusFilter === 'DELIVERED' ? 'border-emerald-500 bg-emerald-500/10' : 'border-[#202046] bg-[#101026] hover:bg-[#161634]'"
+            class="p-4 rounded-xl border text-left transition-all">
+      <div class="text-xs uppercase font-semibold text-emerald-400">Delivered</div>
+      <div class="text-2xl font-bold text-emerald-400 mt-1">{{ deliveredCount }}</div>
+    </button>
+  </div>
+
+  <!-- Orders Grid -->
+  @if (loading) {
+    <div class="flex justify-center py-16">
+      <div class="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else if (filteredOrders.length === 0) {
+    <div class="p-12 text-center rounded-2xl bg-[#0e0e22] border border-[#202046] space-y-3">
+      <span class="text-4xl">🍿</span>
+      <h3 class="text-lg font-bold text-white">No Orders in this view</h3>
+      <p class="text-gray-400 text-xs">New in-seat concession orders will appear here automatically via WebSocket.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (order of filteredOrders; track order.id) {
+        <div [ngClass]="order.status === 'PENDING' ? 'border-amber-500/60 shadow-lg shadow-amber-500/5' : order.status === 'PREPARING' ? 'border-blue-500/60' : 'border-[#222248]'"
+             class="bg-[#111129] border rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-200">
+
+          <!-- Card Header: Target Seat & Location -->
+          <div class="p-4 bg-[#161634] border-b border-[#242450] flex items-center justify-between">
+            <div>
+              <div class="text-xs font-mono text-gray-400 flex items-center gap-1.5">
+                <span>#{{ order.orderNumber }}</span>
+                <span>•</span>
+                <span>{{ order.createdAt | date:'shortTime' }}</span>
+              </div>
+              <div class="text-sm font-bold text-white mt-0.5">
+                {{ order.customerName }}
+              </div>
+            </div>
+
+            <!-- Target Seat Pill -->
+            <div class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider font-mono shadow-sm">
+              {{ order.seatLabel }}
+            </div>
+          </div>
+
+          <!-- Card Body: Hall & Items -->
+          <div class="p-5 flex-1 space-y-4">
+            <!-- Cinema Hall -->
+            <div class="flex items-center gap-2 text-xs text-gray-300">
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              <span class="font-semibold text-white">{{ order.hallName }}</span>
+              <span class="text-gray-500">({{ order.deliveryType }})</span>
+            </div>
+
+            <!-- Notes -->
+            @if (order.notes) {
+              <div class="p-2.5 rounded-lg bg-amber-500/5 border border-amber-500/20 text-xs text-amber-300/90 italic">
+                Note: "{{ order.notes }}"
+              </div>
+            }
+
+            <!-- Items list -->
+            <div class="space-y-2 pt-1 border-t border-[#1e1e40]">
+              @for (item of order.items; track item.id) {
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-md bg-[#23234d] text-amber-400 font-bold font-mono flex items-center justify-center text-[11px]">
+                      {{ item.quantity }}
+                    </span>
+                    <span class="text-white font-medium">{{ item.itemName }}</span>
+                  </div>
+                  <span class="text-gray-400 font-mono">€{{ item.subtotal | number:'1.2-2' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Card Footer: Total & Actions -->
+          <div class="p-4 bg-[#0e0e22] border-t border-[#1e1e40] flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-gray-500 uppercase tracking-wider">Total</div>
+              <div class="text-base font-extrabold text-amber-400 font-mono">
+                €{{ order.totalAmount | number:'1.2-2' }}
+              </div>
+            </div>
+
+            <!-- Status Action Buttons -->
+            <div class="flex items-center gap-2">
+              @if (order.status === 'PENDING') {
+                <button (click)="updateStatus(order, 'PREPARING')"
+                        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-md">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                  <span>Start Preparing</span>
+                </button>
+              } @else if (order.status === 'PREPARING') {
+                <button (click)="updateStatus(order, 'DELIVERED')"
+                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-md">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span>Mark Delivered</span>
+                </button>
+              } @else if (order.status === 'DELIVERED') {
+                <span class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span>Delivered</span>
+                </span>
+              }
+            </div>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -33,6 +33,7 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Customers', route: '/admin/customers', icon: 'users' },
     { label: 'Ticket Validation', route: '/admin/validation', icon: 'scan' },
     { label: 'Live QR Scanner', route: '/admin/scanner', icon: 'camera', badge: 'LIVE' },
+    { label: 'Kitchen & Snacks', route: '/admin/concessions', icon: 'utensils', badge: 'KDS' },
     { label: 'Blockchain', route: '/admin/blockchain', icon: 'cube' },
     { label: 'Statistics', route: '/admin/statistics', icon: 'chart' },
     { label: 'Settings', route: '/admin/settings', icon: 'settings' },

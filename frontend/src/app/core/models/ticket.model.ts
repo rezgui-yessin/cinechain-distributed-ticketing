@@ -9,7 +9,7 @@ export interface Ticket {
   holderName: string;
   qrCode?: string;
   qrCodeData: string;
-  status: 'ACTIVE' | 'USED' | 'CANCELLED';
+  status: 'ACTIVE' | 'USED' | 'CANCELLED' | 'EXPIRED';
   validatedAt?: string;
   movieTitle?: string;
   screeningTime?: string;

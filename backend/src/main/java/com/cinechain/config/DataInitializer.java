@@ -29,6 +29,7 @@ public class DataInitializer implements CommandLineRunner {
     private final HallRepository hallRepository;
     private final SeatRepository seatRepository;
     private final ScreeningRepository screeningRepository;
+    private final com.cinechain.repository.ConcessionItemRepository concessionItemRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${admin.email:admin@cinechain.com}")
@@ -41,6 +42,7 @@ public class DataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         initAdmin();
+        initConcessions();
         if (movieRepository.count() == 0) {
             log.info("Database is empty, initializing sample movies, cinemas, halls, seats, screenings...");
             List<Movie> movies = initMovies();
@@ -279,5 +281,175 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         screeningRepository.saveAll(screenings);
+    }
+
+    private void initConcessions() {
+        if (concessionItemRepository.count() > 0) {
+            return;
+        }
+        log.info("Seeding gourmet cinema concession items...");
+        List<com.cinechain.entity.ConcessionItem> items = List.of(
+                // COMBOS
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("CineChain Signature Royale")
+                        .category(com.cinechain.enums.ConcessionCategory.COMBOS)
+                        .description("Large Black Truffle Popcorn, 2 Artisanal Sodas & a Belgian Dark Chocolate Box. Served in luxury packaging.")
+                        .price(new BigDecimal("18.50"))
+                        .badge("Signature")
+                        .calories(720)
+                        .imageUrl("https://images.unsplash.com/photo-1585647347384-2593bc35786b?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Duo Gourmet Screening Pack")
+                        .category(com.cinechain.enums.ConcessionCategory.COMBOS)
+                        .description("Medium Sweet & Salted Popcorn, 2 Draft Beverages & Loaded Warm Queso Nachos.")
+                        .price(new BigDecimal("16.00"))
+                        .badge("Best Value")
+                        .calories(840)
+                        .imageUrl("https://images.unsplash.com/photo-1512149177596-f817c7ef5d4c?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Solo Cinephile Treat")
+                        .category(com.cinechain.enums.ConcessionCategory.COMBOS)
+                        .description("Medium Clarified Butter Popcorn, chilled drink of choice & gourmet cinema candy.")
+                        .price(new BigDecimal("11.50"))
+                        .badge("Classic")
+                        .calories(580)
+                        .imageUrl("https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+
+                // POPCORN
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Black Truffle & Parmigiano Popcorn")
+                        .category(com.cinechain.enums.ConcessionCategory.POPCORN)
+                        .description("Air-popped organic corn tossed with Italian black summer truffle oil, cracked sea salt and 24-month Parmigiano Reggiano.")
+                        .price(new BigDecimal("8.50"))
+                        .badge("Chef's Special")
+                        .calories(390)
+                        .imageUrl("https://images.unsplash.com/photo-1505686994434-e3cc5abf1330?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Salted Caramel & Brittany Sea Salt")
+                        .category(com.cinechain.enums.ConcessionCategory.POPCORN)
+                        .description("Handcrafted small-batch caramel popcorn infused with French Brittany fleur de sel.")
+                        .price(new BigDecimal("7.00"))
+                        .badge("Bestseller")
+                        .calories(420)
+                        .imageUrl("https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Traditional Golden Clarified Butter")
+                        .category(com.cinechain.enums.ConcessionCategory.POPCORN)
+                        .description("Classic theater popcorn popped in coconut oil and layered with warm clarified European butter.")
+                        .price(new BigDecimal("6.00"))
+                        .badge("Organic")
+                        .calories(340)
+                        .imageUrl("https://images.unsplash.com/photo-1585647347483-22b66260dfff?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+
+                // HOT_BITES
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Artisan Loaded Nachos with Molten Queso")
+                        .category(com.cinechain.enums.ConcessionCategory.HOT_BITES)
+                        .description("Stone-ground blue and yellow corn tortilla chips with warm Monterey Jack queso, fresh pico de gallo, jalapeños, and guacamole.")
+                        .price(new BigDecimal("9.50"))
+                        .badge("Hot & Crisp")
+                        .calories(540)
+                        .imageUrl("https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Mini Wagyu Beef Brioche Sliders (2 pcs)")
+                        .category(com.cinechain.enums.ConcessionCategory.HOT_BITES)
+                        .description("Seared Wagyu beef patties with melted Gruyère cheese, caramelized onions and truffle aioli on toasted brioche.")
+                        .price(new BigDecimal("12.50"))
+                        .badge("Luxury Bite")
+                        .calories(610)
+                        .imageUrl("https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Truffle & Herb Fries with Garlic Aioli")
+                        .category(com.cinechain.enums.ConcessionCategory.HOT_BITES)
+                        .description("Thick-cut skin-on fries tossed in rosemary and white truffle oil, served with homemade garlic aioli.")
+                        .price(new BigDecimal("7.50"))
+                        .badge("Vegetarian")
+                        .calories(440)
+                        .imageUrl("https://images.unsplash.com/photo-1576107232684-1279f3908594?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+
+                // BEVERAGES
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Hibiscus Berry Sparkling Botanical Soda")
+                        .category(com.cinechain.enums.ConcessionCategory.BEVERAGES)
+                        .description("Cold-pressed organic hibiscus flowers infused with fresh berries, lime, and sparkling mountain water.")
+                        .price(new BigDecimal("5.00"))
+                        .badge("Zero Sugar")
+                        .calories(15)
+                        .imageUrl("https://images.unsplash.com/photo-1556881286-fc6915169721?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Cold Brew Nitro Float")
+                        .category(com.cinechain.enums.ConcessionCategory.BEVERAGES)
+                        .description("Velvety nitro cold brew coffee topped with a scoop of Madagascar vanilla bean gelato.")
+                        .price(new BigDecimal("6.50"))
+                        .badge("Craft Cold Brew")
+                        .calories(180)
+                        .imageUrl("https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Artisan Draft Soda (Cola / Blood Orange)")
+                        .category(com.cinechain.enums.ConcessionCategory.BEVERAGES)
+                        .description("Cane-sugar craft fountain soda served ice cold with unlimited free refills during screening.")
+                        .price(new BigDecimal("4.50"))
+                        .badge("Free Refill")
+                        .calories(140)
+                        .imageUrl("https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("San Pellegrino Sparkling Water (500ml)")
+                        .category(com.cinechain.enums.ConcessionCategory.BEVERAGES)
+                        .description("Crisp Italian natural sparkling mineral water served chilled with lemon wedge.")
+                        .price(new BigDecimal("4.00"))
+                        .badge("Chilled Glass")
+                        .calories(0)
+                        .imageUrl("https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+
+                // SNACKS
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Belgian 72% Dark Chocolate Fleur de Sel Bites")
+                        .category(com.cinechain.enums.ConcessionCategory.SNACKS)
+                        .description("Artisan single-origin Belgian dark chocolate medallions studded with toasted almonds and sea salt crystals.")
+                        .price(new BigDecimal("5.50"))
+                        .badge("Artisan")
+                        .calories(270)
+                        .imageUrl("https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build(),
+                com.cinechain.entity.ConcessionItem.builder()
+                        .name("Gourmet Fruit Juice Cinema Gummies")
+                        .category(com.cinechain.enums.ConcessionCategory.SNACKS)
+                        .description("Assorted natural fruit juice gummies with sour fizz ribbons, made without artificial coloring.")
+                        .price(new BigDecimal("4.50"))
+                        .badge("Vegan")
+                        .calories(210)
+                        .imageUrl("https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=600&auto=format&fit=crop&q=80")
+                        .available(true)
+                        .build()
+        );
+        concessionItemRepository.saveAll(items);
+        log.info("Successfully seeded {} gourmet concession items!", items.size());
     }
 }

@@ -45,6 +45,8 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/cinemas/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/screenings/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/concessions/menu").permitAll()
+                .requestMatchers("/api/concessions/**").hasAnyRole("ADMIN", "CUSTOMER")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/validation/**").hasRole("ADMIN")
                 .requestMatchers("/api/blockchain/**").hasRole("ADMIN")

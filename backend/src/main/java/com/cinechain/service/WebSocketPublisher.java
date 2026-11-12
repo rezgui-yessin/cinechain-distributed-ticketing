@@ -115,4 +115,26 @@ public class WebSocketPublisher {
         messagingTemplate.convertAndSendToUser(userId.toString(), "/queue/notifications", msg);
         log.debug("WS >> /user/{}/queue/notifications : {}", userId, payload.getTitle());
     }
+
+    // -------------------------------------------------------------------------
+    // Concessions / Kitchen Display
+    // -------------------------------------------------------------------------
+
+    /**
+     * Broadcast new concession order to kitchen staff.
+     */
+    public void publishConcessionOrderCreated(Object orderPayload) {
+        WsMessage<Object> msg = WsMessage.of(WsMessage.Type.CONCESSION_ORDER_CREATED, orderPayload, "New snack order received");
+        messagingTemplate.convertAndSend("/topic/concessions", msg);
+        log.debug("WS >> /topic/concessions : new order created");
+    }
+
+    /**
+     * Broadcast concession order status update (preparing, delivered).
+     */
+    public void publishConcessionOrderUpdated(Object orderPayload) {
+        WsMessage<Object> msg = WsMessage.of(WsMessage.Type.CONCESSION_ORDER_UPDATED, orderPayload, "Order status updated");
+        messagingTemplate.convertAndSend("/topic/concessions", msg);
+        log.debug("WS >> /topic/concessions : order updated");
+    }
 }
