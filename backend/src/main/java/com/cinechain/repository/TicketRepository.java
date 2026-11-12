@@ -34,4 +34,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT t FROM Ticket t WHERE t.validatedBy IS NOT NULL ORDER BY t.validatedAt DESC")
     List<Ticket> findRecentlyValidated();
+
+    @Query("SELECT t FROM Ticket t WHERE t.status = 'ACTIVE' AND t.booking.screening.endTime < :now")
+    List<Ticket> findActiveTicketsWithScreeningEnded(@Param("now") java.time.LocalDateTime now);
 }

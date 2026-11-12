@@ -1,0 +1,464 @@
+<div class="fixed inset-0 bg-[#070b18] text-slate-100 flex flex-col font-sans select-none overflow-hidden z-50">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP TURNSTILE OPERATOR BAR -->
+  <!-- ========================================================================= -->
+  <header class="h-14 sm:h-16 px-4 bg-[#0a0f24]/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-30 flex-shrink-0">
+    
+    <!-- Left: Gate Designation -->
+    <div class="flex items-center gap-3">
+      <a
+        routerLink="/admin/validation"
+        class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition border border-white/5"
+        title="Exit to Admin">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+      </a>
+
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs sm:text-sm font-black tracking-wider uppercase text-white font-mono">
+            GATE A &bull; TURNSTILE #1
+          </span>
+        </div>
+        <span class="text-[10px] text-slate-400 font-mono hidden sm:block">STAFF PASS SCANNER &bull; REALTIME LEDGER</span>
+      </div>
+    </div>
+
+    <!-- Right: Operational Controls -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      
+      <!-- Audio Chime Toggle -->
+      <button
+        type="button"
+        (click)="soundEnabled = !soundEnabled"
+        class="p-2.5 rounded-xl border transition flex items-center justify-center"
+        [ngClass]="soundEnabled ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-white/5 border-white/10 text-slate-500'"
+        title="Toggle Sound Chimes">
+        <svg *ngIf="soundEnabled" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+        </svg>
+        <svg *ngIf="!soundEnabled" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+        </svg>
+      </button>
+
+      <!-- Flip Camera (Front / Rear) -->
+      <button
+        *ngIf="hasMultipleCameras"
+        type="button"
+        (click)="toggleCameraFacing()"
+        class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition"
+        title="Flip Camera">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
+
+      <!-- Torch / Flashlight (if supported) -->
+      <button
+        *ngIf="hasTorch"
+        type="button"
+        (click)="toggleTorch()"
+        class="p-2.5 rounded-xl border transition"
+        [ngClass]="torchActive ? 'bg-amber-400 text-slate-950 border-amber-400' : 'bg-white/5 border-white/10 text-slate-300'"
+        title="Torch Flashlight">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button
+        type="button"
+        (click)="toggleFullscreen()"
+        class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition"
+        title="Toggle Fullscreen">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        </svg>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN VIEWFINDER & CAMERA STREAM -->
+  <!-- ========================================================================= -->
+  <div class="relative flex-1 bg-black overflow-hidden flex items-center justify-center">
+    
+    <!-- Real Video Stream -->
+    <video
+      #videoElement
+      autoplay
+      playsinline
+      muted
+      class="w-full h-full object-cover">
+    </video>
+
+    <!-- Scanner Target Overlay Reticle -->
+    <div class="absolute inset-0 pointer-events-none flex items-center justify-center z-10 p-6">
+      <div class="relative w-64 h-64 sm:w-80 sm:h-80 border-2 border-white/20 rounded-3xl overflow-hidden backdrop-blur-[1px]">
+        
+        <!-- Glowing Corner Brackets -->
+        <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-400 rounded-tl-xl"></div>
+        <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-400 rounded-tr-xl"></div>
+        <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-400 rounded-bl-xl"></div>
+        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-400 rounded-br-xl"></div>
+
+        <!-- Laser Scanner Sweep Line -->
+        <div class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_15px_#f59e0b] animate-[bounce_2.5s_infinite]"></div>
+
+        <!-- Inner Target Crosshair -->
+        <div class="absolute inset-0 flex items-center justify-center opacity-30">
+          <div class="w-12 h-12 border border-dashed border-amber-400 rounded-full"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Guidance Banner -->
+    <div class="absolute top-6 inset-x-0 flex justify-center pointer-events-none z-20 px-4">
+      <div class="px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-mono font-medium text-slate-300 flex items-center gap-2 shadow-lg">
+        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+        </svg>
+        <span>ALIGN CUSTOMER TICKET QR CODE IN TARGET</span>
+      </div>
+    </div>
+
+    <!-- Validating Spinner Overlay -->
+    <div
+      *ngIf="isValidating"
+      class="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-20">
+      <div class="w-16 h-16 rounded-full border-4 border-amber-400 border-t-transparent animate-spin"></div>
+      <p class="text-sm font-mono uppercase tracking-widest text-amber-300 font-bold">Verifying Ticket Ledger...</p>
+    </div>
+
+    <!-- Camera Error State -->
+    <div
+      *ngIf="cameraError && !cameraActive"
+      class="absolute inset-0 bg-[#070b18] flex flex-col items-center justify-center p-6 text-center z-20">
+      <div class="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-2">Camera Hardware Inactive</h3>
+      <p class="text-xs text-slate-400 max-w-sm mb-6 leading-relaxed">{{ cameraError }}</p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <button
+          type="button"
+          (click)="startCamera()"
+          class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition">
+          Retry Camera
+        </button>
+        <button
+          type="button"
+          (click)="manualModalOpen = true"
+          class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/10 transition">
+          Enter Code Manually
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. VERDICT POPUP CARD OVERLAY (GREEN OR RED) -->
+    <!-- ========================================================================= -->
+    <div
+      *ngIf="verdict"
+      class="absolute inset-0 z-30 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      
+      <!-- GREEN VERDICT: ADMISSION GRANTED -->
+      <div
+        *ngIf="verdict.type === 'SUCCESS'"
+        class="w-full max-w-md bg-[#0a1f14] border-2 border-emerald-500 rounded-3xl p-6 sm:p-7 shadow-[0_0_50px_rgba(16,185,129,0.35)] flex flex-col items-center text-center">
+        
+        <!-- Animated Success Badge -->
+        <div class="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 border-2 border-emerald-400 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/30">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-wider text-emerald-400">
+          {{ verdict.title }}
+        </h2>
+        <p class="text-xs font-mono text-emerald-300/80 mt-1 uppercase tracking-wider">
+          Blockchain Ledger Validated
+        </p>
+
+        <!-- Seat & Attendee Details Highlight Box -->
+        <div class="w-full mt-6 p-4 rounded-2xl bg-black/40 border border-emerald-500/30 text-left space-y-3">
+          
+          <!-- Seat Badge -->
+          <div class="flex items-center justify-between pb-3 border-b border-emerald-500/20">
+            <div>
+              <span class="text-[10px] text-slate-400 font-mono uppercase block">Assigned Seat</span>
+              <span class="text-lg font-black text-amber-400 font-mono">
+                {{ verdict.ticket?.displaySeat || 'Seat Confirmed' }}
+              </span>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
+              HALL 1
+            </span>
+          </div>
+
+          <!-- Attendee & Movie -->
+          <div class="space-y-1">
+            <p class="text-sm font-bold text-white">{{ verdict.ticket?.holderName || 'Customer Pass' }}</p>
+            <p class="text-xs text-slate-300 font-medium">{{ verdict.ticket?.movieTitle || 'Feature Screening' }}</p>
+            <p class="text-[11px] text-slate-400 font-mono">{{ verdict.ticket?.cinemaName || 'CineChain Grand' }}</p>
+          </div>
+
+          <!-- Blockchain TX Stub -->
+          <div class="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span>Pass ID: #{{ verdict.ticket?.id }}</span>
+            <span class="text-emerald-400">{{ verdict.timestamp | date:'HH:mm:ss' }}</span>
+          </div>
+        </div>
+
+        <!-- Next Scan Button -->
+        <button
+          type="button"
+          (click)="clearVerdict()"
+          class="w-full mt-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm tracking-wide uppercase transition shadow-lg shadow-emerald-500/20">
+          Tap to Scan Next Ticket
+        </button>
+      </div>
+
+      <!-- RED VERDICT: ADMISSION DENIED / ALREADY USED -->
+      <div
+        *ngIf="verdict.type === 'ERROR'"
+        class="w-full max-w-md bg-[#240c11] border-2 border-rose-500 rounded-3xl p-6 sm:p-7 shadow-[0_0_50px_rgba(244,63,94,0.35)] flex flex-col items-center text-center">
+        
+        <!-- Animated Rejection Badge -->
+        <div class="w-20 h-20 rounded-full bg-rose-500/20 text-rose-400 border-2 border-rose-400 flex items-center justify-center mb-4 shadow-lg shadow-rose-500/30">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-wider text-rose-400">
+          {{ verdict.title }}
+        </h2>
+        
+        <p class="text-xs text-rose-300 mt-2 px-4 leading-relaxed font-mono">
+          {{ verdict.message }}
+        </p>
+
+        <!-- Warning Context Box -->
+        <div class="w-full mt-6 p-4 rounded-2xl bg-black/40 border border-rose-500/30 text-left space-y-2 text-xs">
+          <div class="flex items-center justify-between font-mono text-[11px] text-slate-400 pb-2 border-b border-rose-500/20">
+            <span>Security Flag</span>
+            <span class="text-rose-400 font-bold uppercase">Fraud Alert</span>
+          </div>
+          <p class="text-slate-300">
+            Do not admit the holder. This pass has already been punched or revoked.
+          </p>
+          <p class="text-[10px] text-slate-400 font-mono">Logged at {{ verdict.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</p>
+        </div>
+
+        <!-- Dismiss Button -->
+        <button
+          type="button"
+          (click)="clearVerdict()"
+          class="w-full mt-6 py-3.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-sm tracking-wide uppercase transition shadow-lg shadow-rose-500/20">
+          Acknowledge & Continue
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. BOTTOM OPERATOR STATS & TOOL DECK -->
+  <!-- ========================================================================= -->
+  <footer class="bg-[#0a0f24] border-t border-white/10 p-3 sm:p-4 z-30 flex-shrink-0">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Session Admission Counters -->
+      <div class="flex items-center gap-4 text-xs font-mono">
+        <div class="flex items-center gap-1.5">
+          <span class="text-slate-400">Total:</span>
+          <span class="font-bold text-white text-sm">{{ sessionStats.total }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Admitted:</span>
+          <span class="font-bold text-sm">{{ sessionStats.admitted }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-rose-400">
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+          <span>Denied:</span>
+          <span class="font-bold text-sm">{{ sessionStats.rejected }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Drawer Toggle -->
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        
+        <!-- Manual QR Code Input Button -->
+        <button
+          type="button"
+          (click)="manualModalOpen = true"
+          class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold border border-white/10 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          <span>Manual Input</span>
+        </button>
+
+        <!-- Test Simulators (for development without physical QR) -->
+        <div class="hidden md:flex items-center gap-1 border-l border-white/10 pl-2">
+          <button
+            type="button"
+            (click)="simulateDemoScan('valid')"
+            title="Simulate Valid Scan (Green Chime)"
+            class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30">
+            Simulate Valid
+          </button>
+          <button
+            type="button"
+            (click)="simulateDemoScan('already-used')"
+            title="Simulate Duplicate Scan (Red Buzzer)"
+            class="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[10px] font-mono border border-rose-500/30">
+            Simulate Used
+          </button>
+        </div>
+
+        <!-- History Drawer Button -->
+        <button
+          type="button"
+          (click)="historyDrawerOpen = !historyDrawerOpen"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold border border-amber-500/30 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>History ({{ scanHistory.length }})</span>
+        </button>
+
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- 5. MANUAL CODE ENTRY MODAL -->
+  <!-- ========================================================================= -->
+  <div
+    *ngIf="manualModalOpen"
+    (click)="manualModalOpen = false"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div
+      (click)="$event.stopPropagation()"
+      class="w-full max-w-md bg-[#10152e] border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+          </svg>
+          Manual QR / Barcode Entry
+        </h3>
+        <button
+          type="button"
+          (click)="manualModalOpen = false"
+          class="p-1 rounded-lg text-slate-400 hover:text-white transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Enter the cryptographic pass code string or scan with an external USB/Bluetooth barcode gun:
+      </p>
+
+      <form (ngSubmit)="submitManualInput()" class="space-y-4">
+        <textarea
+          [(ngModel)]="manualQrInput"
+          name="manualQr"
+          rows="3"
+          placeholder="e.g. CINECHAIN-TICKET-0x8a9b..."
+          class="w-full bg-[#181f44] border border-white/10 rounded-xl p-3 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-amber-400">
+        </textarea>
+
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="manualModalOpen = false"
+            class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="!manualQrInput.trim()"
+            class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition">
+            Validate Code
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. LIVE SCAN HISTORY DRAWER / BOTTOM SHEET -->
+  <!-- ========================================================================= -->
+  <div
+    *ngIf="historyDrawerOpen"
+    class="fixed inset-x-0 bottom-0 max-h-[60vh] bg-[#0a0f24] border-t border-white/15 rounded-t-3xl shadow-2xl z-40 flex flex-col p-4 animate-slide-in">
+    
+    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider font-mono">Recent Gate Scans</h3>
+      </div>
+      <button
+        type="button"
+        (click)="historyDrawerOpen = false"
+        class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-white/5 font-mono">
+        Close Drawer &times;
+      </button>
+    </div>
+
+    <!-- Timeline List -->
+    <div class="flex-1 overflow-y-auto divide-y divide-white/5 py-2">
+      <div *ngIf="scanHistory.length === 0" class="py-8 text-center text-xs text-slate-500 font-mono">
+        No admissions processed yet this session.
+      </div>
+
+      <div
+        *ngFor="let item of scanHistory"
+        class="py-2.5 flex items-center justify-between gap-3 text-xs">
+        
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span
+            class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            [ngClass]="item.status === 'VALID' ? 'bg-emerald-400' : 'bg-rose-400'">
+          </span>
+          <div class="min-w-0">
+            <p class="font-bold text-white truncate">{{ item.holderName }}</p>
+            <p class="text-[11px] text-slate-400 truncate">{{ item.movieTitle }} &bull; {{ item.seatInfo }}</p>
+          </div>
+        </div>
+
+        <div class="text-right flex-shrink-0 font-mono">
+          <span
+            class="px-2 py-0.5 rounded text-[10px] font-bold"
+            [ngClass]="item.status === 'VALID' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'">
+            {{ item.status === 'VALID' ? 'ADMITTED' : 'DENIED' }}
+          </span>
+          <span class="block text-[10px] text-slate-500 mt-0.5">{{ item.timestamp | date:'HH:mm:ss' }}</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

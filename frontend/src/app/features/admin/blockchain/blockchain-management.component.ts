@@ -18,6 +18,7 @@ export class BlockchainManagementComponent implements OnInit {
   totalCount = 0;
   pageSize = 20;
   statusFilter = 'ALL';
+  typeFilter = 'ALL';
   searchHash = '';
 
   stats = {
@@ -56,8 +57,9 @@ export class BlockchainManagementComponent implements OnInit {
   get filteredTransactions(): BlockchainTransaction[] {
     return this.transactions.filter(t => {
       const matchStatus = this.statusFilter === 'ALL' || t.status === this.statusFilter;
+      const matchType = this.typeFilter === 'ALL' || t.type === this.typeFilter;
       const matchHash = !this.searchHash || t.transactionHash.toLowerCase().includes(this.searchHash.toLowerCase());
-      return matchStatus && matchHash;
+      return matchStatus && matchType && matchHash;
     });
   }
 
@@ -68,10 +70,12 @@ export class BlockchainManagementComponent implements OnInit {
 
   typeColor(type: string): string {
     switch (type) {
-      case 'TICKET_ISSUED': return 'text-green-400 bg-green-500/10';
-      case 'TICKET_VALIDATED': return 'text-blue-400 bg-blue-500/10';
-      case 'TICKET_CANCELLED': return 'text-red-400 bg-red-500/10';
-      default: return 'text-gray-400 bg-gray-500/10';
+      case 'TICKET_ISSUED': return 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20';
+      case 'TICKET_VALIDATED': return 'text-blue-400 bg-blue-500/10 border border-blue-500/20';
+      case 'TICKET_HOLDER_CHANGED': return 'text-purple-400 bg-purple-500/10 border border-purple-500/20';
+      case 'TICKET_CANCELLED': return 'text-red-400 bg-red-500/10 border border-red-500/20';
+      case 'TICKET_EXPIRED': return 'text-amber-400 bg-amber-500/10 border border-amber-500/20';
+      default: return 'text-gray-400 bg-gray-500/10 border border-gray-500/20';
     }
   }
 }

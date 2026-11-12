@@ -46,8 +46,8 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.cancelTicket(id, currentUser.getId(), isAdmin));
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
-    @PutMapping("/api/tickets/{id}/holder-name")
+    @PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
+    @PutMapping({"/api/tickets/{id}/holder", "/api/tickets/{id}/holder-name"})
     public ResponseEntity<TicketDto> updateHolderName(
             @PathVariable Long id,
             @Valid @RequestBody HolderNameUpdateRequest request,

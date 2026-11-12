@@ -1,119 +1,690 @@
 <app-navbar></app-navbar>
 
-<main class="min-h-screen bg-[#0a0a1a] text-white">
-  
-  <!-- Hero Section -->
-  <section class="relative min-h-[580px] flex items-center justify-center overflow-hidden border-b border-[#1f1f3a]">
-    <div class="absolute inset-0 bg-hero-gradient opacity-90 z-0"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.12)_0%,transparent_70%)]"></div>
+<main class="min-h-screen bg-[#070714] text-slate-100 selection:bg-amber-500 selection:text-black font-sans antialiased">
+
+  <!-- ========================================================================= -->
+  <!-- 1. CINEMATIC HERO SPOTLIGHT BILLBOARD -->
+  <!-- ========================================================================= -->
+  <section class="relative min-h-[640px] lg:min-h-[720px] flex items-end overflow-hidden border-b border-white/[0.07] bg-[#090918]">
+    <!-- Background Backdrop with Dynamic Movie Image -->
+    <div class="absolute inset-0 z-0">
+      <img
+        *ngIf="featuredMovie"
+        [src]="featuredMovie.posterUrl"
+        [alt]="featuredMovie.title"
+        class="w-full h-full object-cover object-center filter brightness-[0.4] contrast-125 scale-105 transition-all duration-700 ease-out"
+      />
+      <!-- Cinematic Multi-direction Gradient Overlays -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#070714] via-[#070714]/85 to-[#070714]/30"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#070714] via-[#070714]/80 to-transparent"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,158,11,0.08)_0%,transparent_60%)]"></div>
+    </div>
+
+    <!-- Hero Container -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+        
+        <!-- Left: Featured Movie Details -->
+        <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+          
+          <!-- Release / Spec Pill Tags -->
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+              Premiere Selection
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono uppercase bg-white/5 border border-white/10 text-slate-300">
+              <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              IMAX 70mm Laser
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono uppercase bg-white/5 border border-white/10 text-slate-300">
+              <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+              </svg>
+              Dolby Atmos
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h1 class="text-3xl sm:text-5xl xl:text-6xl font-black tracking-tight text-white leading-none">
+            {{ featuredMovie?.title || 'Dune: Part Two' }}
+          </h1>
+
+          <!-- Metadata Ribbon -->
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
+            <!-- Rating -->
+            <div class="flex items-center gap-1.5 text-amber-400 font-bold">
+              <svg class="w-4 h-4 fill-amber-400 text-amber-400" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              <span>{{ featuredMovie?.rating || '8.9' }}</span>
+              <span class="text-slate-500 font-normal">/ 10</span>
+            </div>
+            
+            <span class="text-slate-700">&bull;</span>
+            
+            <!-- Runtime -->
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>{{ formatDuration(featuredMovie?.durationMinutes || 166) }}</span>
+            </div>
+
+            <span class="text-slate-700">&bull;</span>
+
+            <!-- Genre -->
+            <span class="text-slate-300">{{ featuredMovie?.genre }}</span>
+
+            <span class="text-slate-700">&bull;</span>
+
+            <!-- Age Certification -->
+            <span class="px-1.5 py-0.5 rounded text-[11px] font-mono uppercase bg-slate-800 text-slate-300 border border-slate-700">
+              PG-13
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p class="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed line-clamp-3">
+            {{ featuredMovie?.description }}
+          </p>
+
+          <!-- CTAs -->
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a
+              *ngIf="featuredMovie"
+              [routerLink]="['/movies', featuredMovie.id]"
+              class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+              </svg>
+              <span>Reserve Tickets</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+
+            <button
+              type="button"
+              (click)="openTrailer()"
+              class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-medium text-sm text-slate-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-200 backdrop-blur-md">
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <span>Watch Trailer</span>
+            </button>
+
+            <a
+              routerLink="/cinemas"
+              class="inline-flex items-center gap-1.5 px-4 py-3.5 text-xs text-slate-400 hover:text-white transition-colors">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Explore Theaters</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Right: Spotlight Switcher (Thumbnails) -->
+        <div class="lg:col-span-5 xl:col-span-4 hidden lg:block">
+          <div class="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider px-1">
+              <span>Featured Spotlight</span>
+              <span class="font-mono text-amber-400">{{ nowShowingMovies.length }} in Season</span>
+            </div>
+
+            <!-- Mini List of Now Showing -->
+            <div class="space-y-2">
+              <button
+                *ngFor="let m of nowShowingMovies.slice(0, 4)"
+                type="button"
+                (click)="selectFeatured(m)"
+                class="w-full text-left p-2.5 rounded-xl border transition-all duration-200 flex items-center gap-3 group"
+                [ngClass]="featuredMovie?.id === m.id ? 'bg-amber-500/10 border-amber-500/40 shadow-sm' : 'bg-transparent border-transparent hover:bg-white/5 hover:border-white/10'">
+                <img [src]="m.posterUrl" [alt]="m.title" class="w-10 h-14 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform" />
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-bold text-white truncate group-hover:text-amber-400 transition-colors">{{ m.title }}</p>
+                  <p class="text-[11px] text-slate-400 truncate mt-0.5">{{ m.genre }}</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[10px] text-amber-400 font-bold flex items-center gap-0.5">
+                      <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      {{ m.rating }}
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-mono">{{ formatDuration(m.durationMinutes) }}</span>
+                  </div>
+                </div>
+                <div *ngIf="featuredMovie?.id === m.id" class="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 2. QUICK SHOWTIME SELECTOR BAR -->
+  <!-- ========================================================================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-7 relative z-20">
+    <div class="bg-[#101026]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 sm:p-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
+        
+        <!-- Field 1: Movie Selection -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+            </svg>
+            Select Movie
+          </label>
+          <select
+            [(ngModel)]="selectedMovieId"
+            class="w-full bg-[#181836] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500/60 transition">
+            <option *ngFor="let m of nowShowingMovies" [value]="m.id">{{ m.title }} ({{ m.rating }})</option>
+          </select>
+        </div>
+
+        <!-- Field 2: Cinema Location -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+            Select Cinema
+          </label>
+          <select
+            [(ngModel)]="selectedCinemaId"
+            class="w-full bg-[#181836] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500/60 transition">
+            <option *ngFor="let c of cinemas" [value]="c.id">{{ c.name }} - {{ c.city }}</option>
+          </select>
+        </div>
+
+        <!-- Field 3: Date Chips -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Show Date
+          </label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              (click)="selectedDate = 'TODAY'"
+              class="py-2 text-[11px] font-semibold rounded-lg border transition text-center"
+              [ngClass]="selectedDate === 'TODAY' ? 'bg-amber-500 text-black border-amber-500' : 'bg-[#181836] text-slate-300 border-white/10 hover:border-white/20'">
+              Today
+            </button>
+            <button
+              type="button"
+              (click)="selectedDate = 'TOMORROW'"
+              class="py-2 text-[11px] font-semibold rounded-lg border transition text-center"
+              [ngClass]="selectedDate === 'TOMORROW' ? 'bg-amber-500 text-black border-amber-500' : 'bg-[#181836] text-slate-300 border-white/10 hover:border-white/20'">
+              Tomorrow
+            </button>
+            <button
+              type="button"
+              (click)="selectedDate = 'WEEKEND'"
+              class="py-2 text-[11px] font-semibold rounded-lg border transition text-center"
+              [ngClass]="selectedDate === 'WEEKEND' ? 'bg-amber-500 text-black border-amber-500' : 'bg-[#181836] text-slate-300 border-white/10 hover:border-white/20'">
+              Weekend
+            </button>
+          </div>
+        </div>
+
+        <!-- Field 4: Search Button -->
+        <div class="pt-0 sm:pt-4 lg:pt-5">
+          <a
+            [routerLink]="selectedMovieId ? ['/movies', selectedMovieId] : ['/movies']"
+            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-md shadow-amber-500/10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <span>View Available Showtimes</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 3. NOW SHOWING (CURATED CINEMATIC RELEASES) -->
+  <!-- ========================================================================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     
-    <!-- Hero Content -->
-    <div class="relative z-10 max-w-5xl mx-auto px-4 py-20 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-6 animate-pulse-glow">
-        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-        Next-Gen Cinema Booking Platform
+    <!-- Section Header with Genre Filters -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-4 border-b border-white/[0.08]">
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-slate-400 font-mono">Theatrical Program</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Now Showing</h2>
       </div>
 
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-        Immersive Movies.<br/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500">
-          Decentralized Tickets.
-        </span>
-      </h1>
+      <!-- Genre Pills Filter -->
+      <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+        <button
+          *ngFor="let g of genres"
+          type="button"
+          (click)="setGenre(g)"
+          class="px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all whitespace-nowrap"
+          [ngClass]="selectedGenre === g ? 'bg-amber-500 text-slate-950 border-amber-500 font-semibold shadow-sm' : 'bg-[#11112b] text-slate-300 border-white/10 hover:border-white/20'">
+          {{ g === 'ALL' ? 'All Genres' : g }}
+        </button>
+      </div>
+    </div>
 
-      <p class="max-w-2xl mx-auto text-base sm:text-lg text-gray-400 mb-10">
-        Experience cinematic masterpieces across luxury halls with verifiable blockchain ticketing, instant QR validation, and zero scalping.
-      </p>
+    <!-- Movie Cards Grid -->
+    <div *ngIf="!loading; else loadingTpl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      
+      <div
+        *ngFor="let movie of filteredNowShowing"
+        class="group relative bg-[#0f0f24] rounded-2xl border border-white/[0.08] hover:border-amber-500/50 transition-all duration-300 flex flex-col justify-between overflow-hidden hover:shadow-2xl hover:shadow-amber-500/5">
+        
+        <!-- Poster & Media Frame -->
+        <div class="relative aspect-[2/3] w-full overflow-hidden bg-[#161633]">
+          <img
+            [src]="movie.posterUrl"
+            [alt]="movie.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f24] via-transparent to-transparent opacity-90"></div>
 
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <a routerLink="/movies" class="btn-primary flex items-center gap-2 px-8 py-3 text-base">
-          <span>Explore Now Showing</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          <!-- Top Badges: Rating & Format -->
+          <div class="absolute top-3 inset-x-3 flex items-center justify-between">
+            <span class="px-2 py-1 rounded-md bg-black/75 backdrop-blur-md border border-white/10 text-amber-400 text-xs font-bold flex items-center gap-1 shadow-md">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              <span>{{ movie.rating }}</span>
+            </span>
+
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold backdrop-blur-md">
+              IMAX 4K
+            </span>
+          </div>
+
+          <!-- Bottom Poster Info: Runtime & Audio -->
+          <div class="absolute bottom-3 inset-x-3 flex items-center justify-between text-[11px] text-slate-300 font-mono">
+            <span class="flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">
+              <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ formatDuration(movie.durationMinutes) }}
+            </span>
+            <span class="bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm">{{ movie.language }}</span>
+          </div>
+        </div>
+
+        <!-- Movie Details Body -->
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">{{ movie.genre }}</span>
+              <button
+                type="button"
+                (click)="openTrailer(movie)"
+                title="Play Trailer"
+                class="text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4 text-slate-400 hover:text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
+            </div>
+            
+            <h3 class="text-base font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">
+              {{ movie.title }}
+            </h3>
+            
+            <p class="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+              {{ movie.description }}
+            </p>
+
+            <!-- Showtimes Chips -->
+            <div class="mt-4 pt-3 border-t border-white/[0.06]">
+              <span class="block text-[10px] text-slate-400 font-mono uppercase tracking-wider mb-2">Showtimes Today:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <a
+                  *ngFor="let time of sampleShowtimes"
+                  [routerLink]="['/movies', movie.id]"
+                  class="px-2 py-1 rounded bg-[#181836] hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-[11px] font-mono border border-white/5 hover:border-amber-500 transition-colors">
+                  {{ time }}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action -->
+          <div class="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+            <a
+              [routerLink]="['/movies', movie.id]"
+              class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1 font-medium">
+              <span>Film Details</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+
+            <a
+              [routerLink]="['/movies', movie.id]"
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+              </svg>
+              <span>Book Pass</span>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Loading Skeleton -->
+    <ng-template #loadingTpl>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let i of [1,2,3,4]" class="h-96 rounded-2xl bg-[#0f0f24] border border-white/5 animate-pulse"></div>
+      </div>
+    </ng-template>
+
+    <div class="text-center mt-12">
+      <a
+        routerLink="/movies"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 bg-[#12122c] hover:bg-[#1a1a3e] text-slate-300 hover:text-white text-xs font-semibold tracking-wide uppercase transition">
+        <span>Browse Complete Cinema Schedule</span>
+        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 4. PREMIUM THEATRICAL EXPERIENCES (IMAX / DOLBY / VIP) -->
+  <!-- ========================================================================= -->
+  <section class="bg-[#090918] border-y border-white/[0.07] py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="max-w-3xl mx-auto text-center mb-14">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-3">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
           </svg>
-        </a>
-        <a routerLink="/cinemas" class="px-6 py-3 rounded-lg border border-[#2a2a4a] bg-[#12122a]/80 hover:bg-[#1a1a3a] text-gray-300 hover:text-white font-medium transition-all text-base">
-          Browse Cinemas
-        </a>
+          Auditorium Engineering
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">Theatrical Sound & Visual Formats</h2>
+        <p class="text-sm sm:text-base text-slate-400 mt-2">Every CineChain auditorium is calibrated to reference mastering standards.</p>
       </div>
 
-      <!-- Quick Trust Indicators -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-16 max-w-3xl mx-auto pt-8 border-t border-[#1e1e38]">
-        <div>
-          <div class="text-2xl font-bold text-amber-400">100%</div>
-          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Verifiable Tickets</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Experience 1: IMAX Laser -->
+        <div class="p-6 rounded-2xl bg-[#0f0f24] border border-white/[0.08] hover:border-blue-500/40 transition duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">IMAX® with Laser</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Custom dual 4K laser projection delivering unparalleled brightness, deep contrast, and a floor-to-ceiling aspect ratio designed for maximum field of view.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>Projection</span>
+            <span class="text-blue-400 font-semibold">Dual 4K Laser RGB</span>
+          </div>
         </div>
-        <div>
-          <div class="text-2xl font-bold text-blue-400">4K / IMAX</div>
-          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Laser Projection</div>
+
+        <!-- Experience 2: Dolby Cinema -->
+        <div class="p-6 rounded-2xl bg-[#0f0f24] border border-white/[0.08] hover:border-purple-500/40 transition duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Dolby Cinema™</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Dolby Vision® ultra-vivid imaging paired with multi-dimensional Dolby Atmos® sound moving completely around and above the audience with pinpoint precision.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>Audio Spec</span>
+            <span class="text-purple-400 font-semibold">64-Channel Spatial</span>
+          </div>
         </div>
-        <div>
-          <div class="text-2xl font-bold text-emerald-400">Instant</div>
-          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">QR Code Entry</div>
+
+        <!-- Experience 3: VIP Onyx Recliner -->
+        <div class="p-6 rounded-2xl bg-[#0f0f24] border border-white/[0.08] hover:border-amber-500/40 transition duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Director's VIP Suite</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Motorized Italian leather recliners with private acoustic privacy dividers, heated footrests, personal drink chillers, and in-theater chef service.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span>Seating Comfort</span>
+            <span class="text-amber-400 font-semibold">Zero-G Recliners</span>
+          </div>
         </div>
-        <div>
-          <div class="text-2xl font-bold text-purple-400">0%</div>
-          <div class="text-xs text-gray-400 uppercase tracking-wider mt-1">Ticket Counterfeiting</div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 5. VERIFIABLE TICKETING ARCHITECTURE (PROFESSIONAL PRESENTATION) -->
+  <!-- ========================================================================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left: Architecture Explanation -->
+      <div class="lg:col-span-6 space-y-6">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          Trustless Protocol
+        </div>
+
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+          Verifiable Tickets.<br/>
+          Zero Scalping & Counterfeits.
+        </h2>
+
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Traditional cinema booking is vulnerable to duplicate barcode screenshots, scalper bots, and fraudulent reselling. CineChain binds every seat to an encrypted cryptographic token on the ledger.
+        </p>
+
+        <!-- Feature List -->
+        <div class="space-y-4 pt-2">
+          
+          <div class="flex items-start gap-3.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider">Cryptographic Seat Ownership</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Tickets are stored with cryptographic hashes, making duplicate issued passes mathematically impossible.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3.5">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5 border border-blue-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider">Dynamic Rotating QR Tokens</h4>
+              <p class="text-xs text-slate-400 mt-0.5">The customer admission QR code refreshes periodically, preventing static screenshots from being shared or resold.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white uppercase tracking-wider">Sub-300ms Turnstile Admission</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Optical gate scanners verify the cryptographic signature offline or online in under 300 milliseconds.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Interactive Digital Pass Mockup -->
+      <div class="lg:col-span-6 flex justify-center">
+        <div class="w-full max-w-sm rounded-3xl bg-gradient-to-b from-[#181838] to-[#0f0f22] border border-white/10 p-6 shadow-2xl relative overflow-hidden">
+          
+          <!-- Holographic Sheen Accent -->
+          <div class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Pass Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                </svg>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider text-white">CineChain VIP</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              VERIFIED PASS
+            </span>
+          </div>
+
+          <!-- Film Details in Pass -->
+          <div class="py-5 space-y-3">
+            <div>
+              <p class="text-[10px] text-slate-400 font-mono uppercase">Master Feature</p>
+              <h3 class="text-base font-bold text-white">Dune: Part Two (IMAX 70mm)</h3>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 py-2 px-3 rounded-xl bg-black/40 border border-white/5 text-center">
+              <div>
+                <p class="text-[9px] text-slate-400 font-mono uppercase">Hall</p>
+                <p class="text-xs font-bold text-amber-400">IMAX 1</p>
+              </div>
+              <div>
+                <p class="text-[9px] text-slate-400 font-mono uppercase">Row / Seat</p>
+                <p class="text-xs font-bold text-white">Row F &bull; 14</p>
+              </div>
+              <div>
+                <p class="text-[9px] text-slate-400 font-mono uppercase">Showtime</p>
+                <p class="text-xs font-bold text-white">20:15</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulated Dynamic QR Code -->
+          <div class="p-4 rounded-2xl bg-white flex flex-col items-center justify-center">
+            <svg class="w-36 h-36 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
+              <!-- Crisp Simulated QR Pattern -->
+              <rect x="10" y="10" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="4"/>
+              <rect x="16" y="16" width="12" height="12" rx="1"/>
+              <rect x="66" y="10" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="4"/>
+              <rect x="72" y="16" width="12" height="12" rx="1"/>
+              <rect x="10" y="66" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="4"/>
+              <rect x="16" y="72" width="12" height="12" rx="1"/>
+              <!-- Data Dots -->
+              <rect x="42" y="12" width="6" height="6"/>
+              <rect x="52" y="18" width="6" height="6"/>
+              <rect x="42" y="28" width="6" height="6"/>
+              <rect x="12" y="44" width="6" height="6"/>
+              <rect x="22" y="52" width="6" height="6"/>
+              <rect x="32" y="44" width="6" height="6"/>
+              <rect x="46" y="46" width="8" height="8"/>
+              <rect x="60" y="44" width="6" height="6"/>
+              <rect x="74" y="52" width="6" height="6"/>
+              <rect x="42" y="66" width="6" height="6"/>
+              <rect x="54" y="76" width="6" height="6"/>
+              <rect x="70" y="66" width="6" height="6"/>
+              <rect x="80" y="78" width="6" height="6"/>
+            </svg>
+            <span class="text-[10px] font-mono font-semibold text-slate-700 mt-2">
+              BLOCK #49821 &bull; 0x8a9f...3e21
+            </span>
+          </div>
+
+          <!-- Pass Footer -->
+          <div class="mt-4 pt-3 border-t border-white/[0.08] flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span>Dynamic Token Expiry</span>
+            <span class="text-amber-400 font-bold">00:42s</span>
+          </div>
+
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- Now Showing Section -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <!-- ========================================================================= -->
+  <!-- 6. COMING SOON / ADVANCE PRE-SALES -->
+  <!-- ========================================================================= -->
+  <section *ngIf="comingSoonMovies.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/[0.08]">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Now Showing</h2>
-        <p class="text-sm text-gray-400 mt-1">Watch today's most acclaimed movies on the big screen</p>
+        <div class="flex items-center gap-1.5 mb-1">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">Future Releases</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Advance Pre-Sales</h2>
       </div>
-      <a routerLink="/movies" class="text-sm font-medium text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors">
-        <span>View all</span>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <a routerLink="/movies" class="text-xs font-semibold text-amber-400 hover:text-amber-300 transition flex items-center gap-1 uppercase tracking-wider">
+        <span>View Slate</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
       </a>
     </div>
 
-    <!-- Movie Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div *ngFor="let movie of nowShowingMovies" class="card group flex flex-col justify-between overflow-hidden p-0 border border-[#2a2a4a] hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div
+        *ngFor="let movie of comingSoonMovies"
+        class="bg-[#0f0f24] rounded-2xl border border-white/[0.08] overflow-hidden group hover:border-amber-500/40 transition duration-300">
         
-        <!-- Poster Container -->
-        <div class="relative aspect-[2/3] w-full overflow-hidden bg-[#1a1a3a]">
+        <div class="relative aspect-video w-full overflow-hidden bg-[#161633]">
           <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f24] via-[#0f0f24]/30 to-transparent"></div>
           
-          <!-- Rating Badge -->
-          <div class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-amber-500/30 text-amber-400 text-xs font-bold flex items-center gap-1">
-            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-            <span>{{ movie.rating }}</span>
-          </div>
-
-          <!-- Language / Duration Pills -->
-          <div class="absolute bottom-3 left-3 flex gap-2">
-            <span class="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] text-gray-300 font-medium border border-white/10">
-              {{ movie.language }}
-            </span>
-            <span class="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] text-gray-300 font-medium border border-white/10">
-              {{ movie.durationMinutes }}m
+          <div class="absolute top-3 left-3">
+            <span class="px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-bold text-[10px] uppercase font-mono tracking-wider shadow">
+              Opens {{ movie.releaseDate }}
             </span>
           </div>
         </div>
 
-        <!-- Details -->
-        <div class="p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <span class="text-xs text-amber-400 font-semibold tracking-wide uppercase">{{ movie.genre }}</span>
-            <h3 class="text-lg font-bold text-white mt-1 group-hover:text-amber-400 transition-colors line-clamp-1">{{ movie.title }}</h3>
-            <p class="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">{{ movie.description }}</p>
-          </div>
+        <div class="p-5">
+          <span class="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">{{ movie.genre }}</span>
+          <h3 class="text-base font-bold text-white mt-1 group-hover:text-amber-400 transition-colors">{{ movie.title }}</h3>
+          <p class="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">{{ movie.description }}</p>
 
-          <div class="mt-5 pt-4 border-t border-[#1f1f3a] flex items-center justify-between">
-            <a [routerLink]="['/movies', movie.id]" class="text-xs text-gray-400 hover:text-white transition-colors">Details</a>
-            <a [routerLink]="['/movies', movie.id]" class="btn-primary text-xs px-4 py-1.5">
-              Book Tickets
+          <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-mono">{{ movie.language }}</span>
+            <a
+              [routerLink]="['/movies', movie.id]"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition">
+              Pre-Order Alert
             </a>
           </div>
         </div>
@@ -122,66 +693,100 @@
     </div>
   </section>
 
-  <!-- How It Works Section -->
-  <section class="bg-[#0d0d20] border-y border-[#1f1f3a] py-16">
+  <!-- ========================================================================= -->
+  <!-- 7. CINEMA NETWORK LOCATIONS -->
+  <!-- ========================================================================= -->
+  <section class="bg-[#090918] border-t border-white/[0.07] py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-12">
-        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">How CineChain Works</h2>
-        <p class="text-sm text-gray-400 mt-2">Book movie tickets seamlessly with decentralized security</p>
+      
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 pb-4 border-b border-white/[0.08]">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">Theater Locations</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">CineChain Flagship Auditoriums</h2>
+        </div>
+        <a routerLink="/cinemas" class="text-xs font-semibold text-amber-400 hover:text-amber-300 transition uppercase tracking-wider flex items-center gap-1">
+          <span>All 3 Theaters</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
-          <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
-            <span class="text-lg font-bold">1</span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          *ngFor="let cinema of cinemas"
+          class="p-5 rounded-2xl bg-[#0f0f24] border border-white/[0.08] hover:border-white/20 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                {{ cinema.city }}
+              </span>
+              <span class="text-xs text-slate-400 font-mono">{{ cinema.hallCount || 6 }} Halls</span>
+            </div>
+            <h3 class="text-base font-bold text-white">{{ cinema.name }}</h3>
+            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>{{ cinema.address }}</span>
+            </p>
           </div>
-          <h3 class="text-base font-bold text-white mb-2">Select Movie & Seats</h3>
-          <p class="text-xs text-gray-400 leading-relaxed">Choose your favorite movie, cinema hall, and pick your preferred seats with real-time availability.</p>
-        </div>
 
-        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
-          <div class="w-12 h-12 mx-auto rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
-            <span class="text-lg font-bold">2</span>
+          <div class="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-mono">{{ cinema.phone }}</span>
+            <a routerLink="/cinemas" class="text-xs text-amber-400 hover:text-amber-300 font-semibold transition">
+              View Hall Map &rarr;
+            </a>
           </div>
-          <h3 class="text-base font-bold text-white mb-2">Instant Minting & QR</h3>
-          <p class="text-xs text-gray-400 leading-relaxed">Your ticket is recorded on the blockchain ledger, generating a tamper-proof encrypted QR code.</p>
-        </div>
-
-        <div class="p-6 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-center">
-          <div class="w-12 h-12 mx-auto rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
-            <span class="text-lg font-bold">3</span>
-          </div>
-          <h3 class="text-base font-bold text-white mb-2">Fast Scanner Validation</h3>
-          <p class="text-xs text-gray-400 leading-relaxed">Show your QR code at the theater scanner for instant 1-second entry validation. Enjoy the show!</p>
         </div>
       </div>
+
     </div>
   </section>
 
-  <!-- Coming Soon Section -->
-  <section *ngIf="comingSoonMovies.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-8">
-      <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Coming Soon</h2>
-      <p class="text-sm text-gray-400 mt-1">Anticipated blockbusters arriving soon to CineChain theaters</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      <div *ngFor="let movie of comingSoonMovies" class="card overflow-hidden p-0 border border-[#2a2a4a] opacity-80 hover:opacity-100 transition-opacity">
-        <div class="relative aspect-[2/3] w-full overflow-hidden bg-[#1a1a3a]">
-          <img [src]="movie.posterUrl" [alt]="movie.title" class="w-full h-full object-cover" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-          <div class="absolute bottom-3 left-3">
-            <span class="px-2 py-1 rounded bg-amber-500 text-black font-bold text-[10px] uppercase">
-              Releasing {{ movie.releaseDate }}
-            </span>
-          </div>
+  <!-- ========================================================================= -->
+  <!-- 8. OFFICIAL TRAILER MODAL -->
+  <!-- ========================================================================= -->
+  <div
+    *ngIf="trailerModalOpen"
+    (click)="closeTrailer()"
+    class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+    <div
+      (click)="$event.stopPropagation()"
+      class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-4 py-3 bg-[#11112b] border-b border-white/10">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <span class="text-xs font-bold text-white uppercase tracking-wider">Official Feature Trailer</span>
         </div>
-        <div class="p-4">
-          <h3 class="font-bold text-white">{{ movie.title }}</h3>
-          <p class="text-xs text-gray-400 mt-1">{{ movie.genre }}</p>
-        </div>
+        <button
+          type="button"
+          (click)="closeTrailer()"
+          class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
+
+      <!-- Video Player Frame -->
+      <div class="relative aspect-video w-full bg-black">
+        <iframe
+          *ngIf="safeTrailerUrl"
+          [src]="safeTrailerUrl"
+          title="Movie Trailer"
+          class="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+
     </div>
-  </section>
+  </div>
 
 </main>

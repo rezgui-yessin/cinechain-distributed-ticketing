@@ -41,6 +41,33 @@ public class ValidationService {
             throw new IllegalArgumentException("Ticket has been cancelled and cannot be used");
         }
 
+        if (ticket.getStatus() == TicketStatus.EXPIRED) {
+            throw new IllegalArgumentException("Ticket has expired because the event has already ended");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = ticket.getBooking().getScreening().getStartTime();
+        LocalDateTime endTime = ticket.getBooking().getScreening().getEndTime();
+
+        // Check if event has already finished
+        if (endTime != null && now.isAfter(endTime)) {
+            ticket.setStatus(TicketStatus.EXPIRED);
+            ticketRepository.save(ticket);
+            blockchainService.recordTransaction(
+                    ticket.getId(),
+                    ticket.getBooking().getId(),
+                    TransactionType.TICKET_EXPIRED,
+                    String.format("{\"ticketId\":%d,\"expiredAt\":\"%s\",\"reason\":\"Event ended at %s\"}",
+                            ticket.getId(), now, endTime)
+            );
+            throw new IllegalArgumentException("Event has ended. Ticket is expired and can no longer be used");
+        }
+
+        // Check if event start time is reached (allowing 45-minute early admission)
+        if (startTime != null && now.isBefore(startTime.minusMinutes(45))) {
+            throw new IllegalArgumentException("Admission gate not open yet. Doors open 45 minutes before start time (" + startTime + ")");
+        }
+
         ticket.setStatus(TicketStatus.USED);
         ticket.setValidatedAt(LocalDateTime.now());
         ticket.setValidatedBy(adminUser);

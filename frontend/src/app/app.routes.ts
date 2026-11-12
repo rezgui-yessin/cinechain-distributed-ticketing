@@ -84,6 +84,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/validation/ticket-validation.component').then(m => m.TicketValidationComponent)
       },
       {
+        path: 'scanner',
+        loadComponent: () => import('./features/admin/scanner/staff-scanner.component').then(m => m.StaffScannerComponent)
+      },
+      {
         path: 'blockchain',
         loadComponent: () => import('./features/admin/blockchain/blockchain-management.component').then(m => m.BlockchainManagementComponent)
       },

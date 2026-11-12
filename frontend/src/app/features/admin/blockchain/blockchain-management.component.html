@@ -35,7 +35,15 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
         </svg>
       </div>
-      <select [(ngModel)]="statusFilter" class="admin-input w-48">
+      <select [(ngModel)]="typeFilter" class="admin-input w-48">
+        <option value="ALL">All Event Types</option>
+        <option value="TICKET_ISSUED">Ticket Issued</option>
+        <option value="TICKET_VALIDATED">Ticket Validated</option>
+        <option value="TICKET_HOLDER_CHANGED">Holder Changed</option>
+        <option value="TICKET_CANCELLED">Ticket Cancelled</option>
+        <option value="TICKET_EXPIRED">Ticket Expired</option>
+      </select>
+      <select [(ngModel)]="statusFilter" class="admin-input w-44">
         <option value="ALL">All Status</option>
         <option value="CONFIRMED">Confirmed</option>
         <option value="PENDING">Pending</option>

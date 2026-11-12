@@ -140,6 +140,7 @@ public class TicketService {
             throw new IllegalArgumentException("Cannot modify holder for inactive ticket");
         }
 
+        String previousHolder = ticket.getHolderName();
         ticket.setHolderName(newHolderName);
 
         // Re-generate QR Code
@@ -161,6 +162,42 @@ public class TicketService {
             log.error("Failed to re-generate QR code upon holder change", e);
         }
 
-        return TicketDto.from(ticketRepository.save(ticket));
+        Ticket savedTicket = ticketRepository.save(ticket);
+
+        // Record holder change state transition on blockchain ledger
+        blockchainService.recordTransaction(
+                savedTicket.getId(),
+                booking.getId(),
+                TransactionType.TICKET_HOLDER_CHANGED,
+                String.format("{\"ticketId\":%d,\"newHolder\":\"%s\",\"previousHolder\":\"%s\"}",
+                        savedTicket.getId(), newHolderName, previousHolder)
+        );
+
+        return TicketDto.from(savedTicket);
+    }
+
+    /**
+     * Requirement: Invalidazione del biglietto dopo la fine dell'evento.
+     * Background scheduled task checking for ended screenings every minute.
+     */
+    @org.springframework.scheduling.annotation.Scheduled(fixedRate = 60000)
+    @Transactional
+    public void autoInvalidateExpiredTickets() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Ticket> expiredTickets = ticketRepository.findActiveTicketsWithScreeningEnded(now);
+        if (!expiredTickets.isEmpty()) {
+            for (Ticket t : expiredTickets) {
+                t.setStatus(TicketStatus.EXPIRED);
+                ticketRepository.save(t);
+                blockchainService.recordTransaction(
+                        t.getId(),
+                        t.getBooking().getId(),
+                        TransactionType.TICKET_EXPIRED,
+                        String.format("{\"ticketId\":%d,\"expiredAt\":\"%s\",\"reason\":\"Screening ended\"}",
+                                t.getId(), now)
+                );
+                log.info("Ticket #{} automatically invalidated and recorded on blockchain as EXPIRED (screening ended).", t.getId());
+            }
+        }
     }
 }

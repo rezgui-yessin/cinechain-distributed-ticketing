@@ -40,6 +40,7 @@ export interface ValidationEventPayload {
   movieTitle: string;
   seatInfo: string;
   cinemaName: string;
+  hallName?: string;
   screeningTime: string;
   validatedAt: string;
   validatedBy: string;
