@@ -56,6 +56,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/validation/**").hasRole("ADMIN")
                 .requestMatchers("/api/blockchain/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/payments/config").permitAll()
+                .requestMatchers("/api/payments/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "CUSTOMER")
                 .requestMatchers("/api/tickets/**").hasAnyRole("ADMIN", "CUSTOMER")

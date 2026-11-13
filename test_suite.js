@@ -491,6 +491,25 @@ async function runAllTests() {
   const sentimentRes = await get('/api/ai/movies/1/sentiment');
   record('Get AI Sentiment Summary', 'GET', '/api/ai/movies/1/sentiment', sentimentRes.status, 200, `Overall: ${sentimentRes.data?.overallSentiment}`);
 
+  // 13. STRIPE REAL PAYMENT ENGINE
+  console.log('\n--- [13/13] STRIPE REAL PAYMENT ENGINE ---');
+  const paymentConfig = await get('/api/payments/config');
+  record('Get Stripe Public Config', 'GET', '/api/payments/config', paymentConfig.status, 200, `Key: ${paymentConfig.data?.publishableKey?.substring(0, 15)}...`);
+
+  if (createdBookingId) {
+    const intentRes = await post('/api/payments/create-payment-intent', {
+      bookingId: createdBookingId,
+      currency: 'usd'
+    }, customerToken);
+    record('Create Stripe PaymentIntent', 'POST', '/api/payments/create-payment-intent', intentRes.status, 200, `Intent: ${intentRes.data?.paymentIntentId}, Amount: $${intentRes.data?.amount}`);
+
+    const confirmRes = await post('/api/payments/confirm-payment', {
+      bookingId: createdBookingId,
+      paymentIntentId: intentRes.data?.paymentIntentId || 'pi_test_123'
+    }, customerToken);
+    record('Confirm Stripe Payment', 'POST', '/api/payments/confirm-payment', confirmRes.status, 200, `Status: ${confirmRes.data?.status}`);
+  }
+
   // SUMMARY REPORT
   console.log('\n========================================================');
   console.log('                   TEST SUITE SUMMARY                   ');
