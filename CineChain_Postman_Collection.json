@@ -1,0 +1,216 @@
+{
+  "info": {
+    "name": "CineChain API End-to-End Collection",
+    "_postman_id": "c19b33a0-7b5e-4c48-8df0-cinechain001",
+    "description": "Complete Postman collection for CineChain with sample payloads for all endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "customerToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "createdMovieId", "value": "1" },
+    { "key": "createdCinemaId", "value": "1" },
+    { "key": "createdHallId", "value": "1" },
+    { "key": "createdScreeningId", "value": "13" },
+    { "key": "createdTicketId", "value": "22" },
+    { "key": "createdQrCodeData", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test_customer@cinechain.com\",\n  \"password\": \"Password@123\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Rivera\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@cinechain.com\",\n  \"password\": \"Admin@CineChain2024!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@cinechain.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Movies Management",
+      "item": [
+        {
+          "name": "Insert Movie (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Gladiator II (IMAX Premiere)\",\n  \"description\": \"Years after witnessing Maximus, Lucius enters the Colosseum.\",\n  \"genre\": \"Action / Drama\",\n  \"language\": \"English\",\n  \"durationMinutes\": 148,\n  \"releaseDate\": \"2026-11-20\",\n  \"rating\": 8.8,\n  \"posterUrl\": \"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800\",\n  \"trailerUrl\": \"https://www.youtube.com/watch?v=4rgYUipGJNo\",\n  \"status\": \"NOW_SHOWING\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/movies", "host": ["{{baseUrl}}"], "path": ["api", "movies"] }
+          }
+        },
+        {
+          "name": "Get All Movies (Public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/movies", "host": ["{{baseUrl}}"], "path": ["api", "movies"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Cinemas & Halls",
+      "item": [
+        {
+          "name": "Insert Cinema (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CineChain Dolby Cinema\",\n  \"address\": \"42 Avenue des Champs-Elysees\",\n  \"city\": \"Paris\",\n  \"phone\": \"+33 1 55 00 00 00\",\n  \"email\": \"paris@cinechain.fr\",\n  \"imageUrl\": \"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/cinemas", "host": ["{{baseUrl}}"], "path": ["api", "admin", "cinemas"] }
+          }
+        },
+        {
+          "name": "Insert Hall (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hall 1 - Dolby Atmos Luxe\",\n  \"totalCapacity\": 80,\n  \"cinemaId\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/halls", "host": ["{{baseUrl}}"], "path": ["api", "admin", "halls"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Screenings & Bookings",
+      "item": [
+        {
+          "name": "Schedule Screening (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movieId\": 1,\n  \"hallId\": 1,\n  \"startTime\": \"2026-11-25T20:00:00\",\n  \"endTime\": \"2026-11-25T22:30:00\",\n  \"price\": 15.50\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/screenings", "host": ["{{baseUrl}}"], "path": ["api", "admin", "screenings"] }
+          }
+        },
+        {
+          "name": "Book Ticket (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"screeningId\": 13,\n  \"seatIds\": [1],\n  \"holderName\": \"Sarah Connor\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings", "host": ["{{baseUrl}}"], "path": ["api", "bookings"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Concessions & In-Seat Snacks",
+      "item": [
+        {
+          "name": "Get Gourmet Menu",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/concessions/menu", "host": ["{{baseUrl}}"], "path": ["api", "concessions", "menu"] }
+          }
+        },
+        {
+          "name": "Create In-Seat Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryType\": \"IN_SEAT\",\n  \"ticketId\": 22,\n  \"notes\": \"Warm melted butter on popcorn\",\n  \"items\": [\n    { \"itemId\": 1, \"quantity\": 1, \"options\": \"Large Sweet\" },\n    { \"itemId\": 2, \"quantity\": 1, \"options\": \"Cold\" }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/concessions/orders", "host": ["{{baseUrl}}"], "path": ["api", "concessions", "orders"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. P2P Resale & NFT Stubs",
+      "item": [
+        {
+          "name": "List Ticket on Resale Market",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticketId\": 22,\n  \"resalePrice\": 12.00,\n  \"notes\": \"Transferring fair price ticket.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/resale/list", "host": ["{{baseUrl}}"], "path": ["api", "resale", "list"] }
+          }
+        },
+        {
+          "name": "Mint Commemorative NFT Stub",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/nft-stubs/claim/22", "host": ["{{baseUrl}}"], "path": ["api", "nft-stubs", "claim", "22"] }
+          }
+        }
+      ]
+    }
+  ]
+}
