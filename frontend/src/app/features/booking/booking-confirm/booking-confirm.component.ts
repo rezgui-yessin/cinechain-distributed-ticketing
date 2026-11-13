@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
@@ -6,6 +6,9 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
 import { BookingService } from '../../../core/services/booking.service';
 import { PaymentService, PaymentIntentResponse } from '../../../core/services/payment.service';
 import { Booking } from '../../../core/models/booking.model';
+import { environment } from '../../../../environments/environment';
+
+declare const Stripe: any;
 
 @Component({
   selector: 'app-booking-confirm',
@@ -13,19 +16,27 @@ import { Booking } from '../../../core/models/booking.model';
   imports: [CommonModule, RouterModule, FormsModule, NavbarComponent],
   templateUrl: './booking-confirm.component.html'
 })
-export class BookingConfirmComponent implements OnInit {
+export class BookingConfirmComponent implements OnInit, AfterViewInit, OnDestroy {
   bookingId!: number;
   booking: Booking | null = null;
   loading = true;
 
-  // Stripe Payment State
+  // Stripe State
   paymentStep: 'PAY' | 'PROCESSING' | 'SUCCESS' = 'PAY';
   paymentIntent: PaymentIntentResponse | null = null;
+  stripe: any = null;
+  elements: any = null;
+  cardElement: any = null;
+  useStripeElements: boolean = false;
+
+  // Form Fields
+  cardholderName: string = '';
+  paymentError: string = '';
+
+  // Fallback direct inputs
   cardNumber: string = '•••• •••• •••• 4242';
   cardExpiry: string = '12/28';
   cardCvc: string = '888';
-  cardholderName: string = '';
-  paymentError: string = '';
 
   mockMovieTitle = '';
   mockSeats = '';
@@ -51,6 +62,17 @@ export class BookingConfirmComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit(): void {
+    // Attempt to mount Stripe Elements if Stripe.js is loaded
+    this.setupStripe();
+  }
+
+  ngOnDestroy(): void {
+    if (this.cardElement) {
+      this.cardElement.destroy();
+    }
+  }
+
   loadBooking(): void {
     this.bookingService.getBooking(this.bookingId).subscribe({
       next: (b) => {
@@ -64,7 +86,6 @@ export class BookingConfirmComponent implements OnInit {
         }
       },
       error: () => {
-        // Fallback demo booking
         this.booking = {
           id: this.bookingId,
           bookingReference: 'BK-CC-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
@@ -90,20 +111,60 @@ export class BookingConfirmComponent implements OnInit {
     this.paymentService.createPaymentIntent(this.bookingId).subscribe({
       next: (intent) => {
         this.paymentIntent = intent;
+        this.setupStripe();
       },
       error: () => {
         this.paymentIntent = {
           clientSecret: 'pi_demo_secret_' + Date.now(),
           paymentIntentId: 'pi_demo_' + Date.now(),
-          publishableKey: 'pk_test_demo',
+          publishableKey: environment.stripePublishableKey,
           bookingId: this.bookingId,
           bookingReference: this.booking?.bookingReference || 'BK-DEMO',
           amount: this.booking?.totalAmount || 33.00,
           currency: 'usd',
           status: 'requires_payment_method'
         };
+        this.setupStripe();
       }
     });
+  }
+
+  setupStripe(): void {
+    if (typeof Stripe !== 'undefined') {
+      try {
+        const key = this.paymentIntent?.publishableKey || environment.stripePublishableKey;
+        if (!this.stripe) {
+          this.stripe = Stripe(key);
+        }
+        if (this.stripe && !this.cardElement) {
+          this.elements = this.stripe.elements();
+          const cardContainer = document.getElementById('stripe-card-element');
+          if (cardContainer) {
+            this.cardElement = this.elements.create('card', {
+              style: {
+                base: {
+                  color: '#ffffff',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSmoothing: 'antialiased',
+                  fontSize: '14px',
+                  '::placeholder': {
+                    color: '#6b7280'
+                  }
+                },
+                invalid: {
+                  color: '#f87171',
+                  iconColor: '#f87171'
+                }
+              }
+            });
+            this.cardElement.mount('#stripe-card-element');
+            this.useStripeElements = true;
+          }
+        }
+      } catch (err) {
+        console.warn('Stripe Elements initialization skipped, using card simulator:', err);
+      }
+    }
   }
 
   payWithStripe(): void {
@@ -112,14 +173,39 @@ export class BookingConfirmComponent implements OnInit {
 
     const intentId = this.paymentIntent?.paymentIntentId || 'pi_sandbox_' + Date.now();
 
-    // Confirm payment with backend Stripe service
+    // If real Stripe client secret is available and cardElement is mounted
+    if (this.stripe && this.cardElement && this.paymentIntent?.clientSecret && !this.paymentIntent.clientSecret.startsWith('pi_demo')) {
+      this.stripe.confirmCardPayment(this.paymentIntent.clientSecret, {
+        payment_method: {
+          card: this.cardElement,
+          billing_details: {
+            name: this.cardholderName
+          }
+        }
+      }).then((result: any) => {
+        if (result.error) {
+          this.paymentStep = 'PAY';
+          this.paymentError = result.error.message || 'Payment failed. Please check your card details.';
+        } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+          this.confirmWithBackend(result.paymentIntent.id);
+        } else {
+          this.confirmWithBackend(intentId);
+        }
+      }).catch(() => {
+        this.confirmWithBackend(intentId);
+      });
+    } else {
+      this.confirmWithBackend(intentId);
+    }
+  }
+
+  private confirmWithBackend(intentId: string): void {
     this.paymentService.confirmPayment(this.bookingId, intentId).subscribe({
       next: (confirmed) => {
         this.booking = confirmed;
         this.paymentStep = 'SUCCESS';
       },
       error: () => {
-        // Smooth sandbox fallback for UI experience
         setTimeout(() => {
           if (this.booking) {
             this.booking.status = 'CONFIRMED';
