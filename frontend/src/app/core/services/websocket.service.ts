@@ -106,10 +106,9 @@ export class WebSocketService implements OnDestroy {
     if (this.isConnected || this.socket) return;
 
     try {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = window.location.hostname === 'localhost'
         ? 'ws://localhost:8080/ws-native'
-        : `${protocol}//${window.location.host}/ws-native`;
+        : 'wss://cinechain-backend-production.up.railway.app/ws-native';
       this.socket = new WebSocket(wsUrl);
 
       this.socket.onopen = () => {
