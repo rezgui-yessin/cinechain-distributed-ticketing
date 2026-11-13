@@ -1,4 +1,11 @@
 const http = require('http');
+const https = require('https');
+
+const targetUrlStr = process.env.TARGET_URL || 'http://localhost:8080';
+const parsedTarget = new URL(targetUrlStr);
+const isHttps = parsedTarget.protocol === 'https:';
+const client = isHttps ? https : http;
+const defaultPort = parsedTarget.port || (isHttps ? 443 : 80);
 
 let adminToken = '';
 let customerToken = '';
@@ -25,9 +32,10 @@ function record(name, method, path, status, expectedStatus, details = '') {
 
 function request(options, body = null) {
   return new Promise((resolve) => {
-    const req = http.request({
-      hostname: 'localhost',
-      port: 8080,
+    const req = client.request({
+      protocol: parsedTarget.protocol,
+      hostname: parsedTarget.hostname,
+      port: defaultPort,
       ...options,
     }, res => {
       let d = '';
@@ -126,9 +134,10 @@ function uploadMultipart(path, fieldName, filename, fileBuffer, mimeType, token,
 
     const payload = Buffer.concat(chunks);
 
-    const req = http.request({
-      hostname: 'localhost',
-      port: 8080,
+    const req = client.request({
+      protocol: parsedTarget.protocol,
+      hostname: parsedTarget.hostname,
+      port: defaultPort,
       path,
       method: 'POST',
       headers: {
@@ -154,6 +163,7 @@ function uploadMultipart(path, fieldName, filename, fileBuffer, mimeType, token,
 async function runAllTests() {
   console.log('========================================================');
   console.log('    CINECHAIN FULL ENDPOINT & CLOUDINARY TEST SUITE      ');
+  console.log('    Target URL: ' + targetUrlStr);
   console.log('========================================================\n');
 
   // 1. AUTH ENDPOINTS
