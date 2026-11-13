@@ -1,9 +1,8 @@
 FROM maven:3.9-amazoncorretto-21 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn dependency:resolve -q
 COPY src ./src
-RUN mvn clean package -DskipTests -q
+RUN mvn clean package -DskipTests -B
 
 FROM amazoncorretto:21-alpine
 WORKDIR /app

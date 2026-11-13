@@ -51,6 +51,9 @@ services:
       JWT_SECRET: cinechain-super-secret-jwt-key-at-least-256-bits-for-hs256-algorithm-security
       ADMIN_EMAIL: admin@cinechain.com
       ADMIN_PASSWORD: Admin@CineChain2024!
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-djalg6hkt}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-675896959317332}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-9fxNxXuQUOUprJDZNZx0HWyboAQ}
     depends_on:
       postgres:
         condition: service_healthy
