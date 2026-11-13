@@ -1,0 +1,57 @@
+services:
+  # 1. CineChain PostgreSQL Database
+  - type: postgres
+    name: cinechain-db
+    env: docker
+    plan: free
+    ipAllowList: []
+
+  # 2. CineChain Redis Cache
+  - type: redis
+    name: cinechain-redis
+    plan: free
+    ipAllowList: []
+
+  # 3. CineChain Spring Boot Web Service
+  - type: web
+    name: cinechain-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    plan: free
+    healthCheckPath: /api/payments/config
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cinechain-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: cinechain-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: cinechain-redis
+          property: port
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@cinechain.com
+      - key: ADMIN_PASSWORD
+        value: Admin@CineChain2024!
+      - key: CLOUDINARY_CLOUD_NAME
+        value: djalg6hkt
+      - key: CLOUDINARY_API_KEY
+        value: 675896959317332
+      - key: CLOUDINARY_API_SECRET
+        value: 9fxNxXuQUOUprJDZNZx0HWyboAQ
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        value: pk_test_51UaGTuBJRAEfJuJxzdQ0jvDygCDkOlhb0Ej6Y5NaiDqzAunkG6v6ryACbCzTBg3gIs60SVstcxBLBPAPtnVH605b00Hz6GF7f9
+      - key: GEMINI_API_KEY
+        sync: false
