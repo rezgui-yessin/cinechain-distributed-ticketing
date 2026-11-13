@@ -26,6 +26,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/customer/concessions/in-seat-concessions.component').then(m => m.InSeatConcessionsComponent)
   },
   {
+    path: 'resale',
+    loadComponent: () => import('./features/public/resale/resale-marketplace.component').then(m => m.ResaleMarketplaceComponent)
+  },
+  {
     path: 'book/:screeningId',
     loadComponent: () => import('./features/booking/seat-selection/seat-selection.component').then(m => m.SeatSelectionComponent)
   },
@@ -136,6 +140,10 @@ export const routes: Routes = [
       {
         path: 'concessions',
         loadComponent: () => import('./features/customer/concessions/in-seat-concessions.component').then(m => m.InSeatConcessionsComponent)
+      },
+      {
+        path: 'nft-stubs',
+        loadComponent: () => import('./features/customer/nft-stubs/nft-stubs.component').then(m => m.NftStubsComponent)
       },
       {
         path: 'bookings',

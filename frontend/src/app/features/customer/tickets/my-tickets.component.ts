@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { TicketService } from '../../../core/services/ticket.service';
 import { Ticket } from '../../../core/models/ticket.model';
 
+import { ResaleService } from '../../../core/services/resale.service';
+
 @Component({
   selector: 'app-my-tickets',
   standalone: true,
@@ -29,8 +31,17 @@ export class MyTicketsComponent implements OnInit {
   changeHolderTicket: Ticket | null = null;
   newHolderName = '';
 
+  // Resale Modal state
+  resaleTargetTicket: Ticket | null = null;
+  resalePrice: number = 0;
+  resaleNotes: string = '';
+
+  // Claim NFT state
+  claimingNftTicketId: number | null = null;
+
   constructor(
     private ticketService: TicketService,
+    private resaleService: ResaleService,
     private route: ActivatedRoute
   ) {}
 
@@ -165,6 +176,65 @@ export class MyTicketsComponent implements OnInit {
       error: (err) => {
         this.actionLoading = false;
         this.errorMessage = err.error?.message || 'Failed to update ticket holder name.';
+      }
+    });
+  }
+
+  // Resale Modal
+  openResaleModal(ticket: Ticket): void {
+    this.resaleTargetTicket = ticket;
+    this.resalePrice = ticket.price || 12.5;
+    this.resaleNotes = 'Unable to attend, transferring seat at fair price.';
+    this.errorMessage = '';
+  }
+
+  closeResaleModal(): void {
+    this.resaleTargetTicket = null;
+    this.resaleNotes = '';
+  }
+
+  confirmListResale(): void {
+    if (!this.resaleTargetTicket || this.resalePrice <= 0) return;
+
+    this.actionLoading = true;
+    this.errorMessage = '';
+    const ticketId = this.resaleTargetTicket.id;
+
+    this.resaleService.createListing({
+      ticketId,
+      resalePrice: this.resalePrice,
+      notes: this.resaleNotes
+    }).subscribe({
+      next: (listing) => {
+        this.actionLoading = false;
+        this.closeResaleModal();
+        this.showSuccess(`Ticket #${ticketId} listed on P2P Resale Marketplace for €${this.resalePrice}!`);
+        const idx = this.tickets.findIndex(t => t.id === ticketId);
+        if (idx !== -1) {
+          this.tickets[idx] = { ...this.tickets[idx], status: 'LISTED_FOR_RESALE' as any };
+          this.applyFilter();
+        }
+      },
+      error: (err) => {
+        this.actionLoading = false;
+        this.errorMessage = err.error?.message || 'Failed to list ticket for resale.';
+      }
+    });
+  }
+
+  // Claim NFT Stub
+  claimNftStub(ticket: Ticket): void {
+    this.claimingNftTicketId = ticket.id;
+    this.errorMessage = '';
+
+    this.resaleService.claimNftStub(ticket.id).subscribe({
+      next: (stub) => {
+        this.claimingNftTicketId = null;
+        this.showSuccess(`🏆 Commemorative NFT Stub #${stub.tokenId} successfully claimed and minted!`);
+      },
+      error: (err) => {
+        this.claimingNftTicketId = null;
+        this.errorMessage = err.error?.message || 'Failed to mint NFT stub.';
       }
     });
   }

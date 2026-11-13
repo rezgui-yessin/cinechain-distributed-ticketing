@@ -393,12 +393,78 @@ async function runAllTests() {
   }
 
   // 10. DASHBOARDS
-  console.log('\n--- [10/10] DASHBOARDS & METRICS ---');
+  console.log('\n--- [10/11] DASHBOARDS & METRICS ---');
   const adminDash = await get('/api/admin/dashboard/stats', adminToken);
   record('Admin Dashboard Stats', 'GET', '/api/admin/dashboard/stats', adminDash.status, 200);
 
   const custDash = await get('/api/customer/dashboard/stats', customerToken);
   record('Customer Dashboard Stats', 'GET', '/api/customer/dashboard/stats', custDash.status, 200);
+
+  // 11. P2P RESALE & NFT STUBS
+  console.log('\n--- [11/11] P2P RESALE MARKETPLACE & COMMEMORATIVE NFT STUBS ---');
+  // 1. Get marketplace listings
+  const marketplaceRes = await get('/api/resale/marketplace');
+  record('Get Public Resale Marketplace', 'GET', '/api/resale/marketplace', marketplaceRes.status, 200, `${marketplaceRes.data?.length || 0} resale listings`);
+
+  // 2. Customer lists a ticket for resale (create a fresh ticket first)
+  const resaleSeats = await get('/api/screenings/13/seats', customerToken);
+  const availableResaleSeat = (resaleSeats.data || []).find(s => s.status === 'AVAILABLE');
+  if (availableResaleSeat) {
+    const bookResale = await post('/api/bookings', {
+      screeningId: 13,
+      seatIds: [availableResaleSeat.id],
+      holderName: 'Resale Seller'
+    }, customerToken);
+
+    const ticketToResell = bookResale.data?.tickets?.[0];
+    if (ticketToResell) {
+      // Anti-Scalping Test: Try listing above face value (should fail 400)
+      const scalperRes = await post('/api/resale/list', {
+        ticketId: ticketToResell.id,
+        resalePrice: 999.00
+      }, customerToken);
+      record('Anti-Scalping Rule Enforcement (Over Face Value Blocked)', 'POST', '/api/resale/list', scalperRes.status, 400, scalperRes.data?.message || 'Blocked');
+
+      // Valid fair-price listing
+      const fairListRes = await post('/api/resale/list', {
+        ticketId: ticketToResell.id,
+        resalePrice: 10.00,
+        notes: 'Cannot attend tonight'
+      }, customerToken);
+      record('List Ticket on P2P Resale Marketplace', 'POST', '/api/resale/list', fairListRes.status, 201, `Listing #${fairListRes.data?.id} at €${fairListRes.data?.resalePrice}`);
+
+      const listingId = fairListRes.data?.id;
+
+      // Seller views their listings
+      const myListings = await get('/api/resale/my-listings', customerToken);
+      record('Get Customer Active Resale Listings', 'GET', '/api/resale/my-listings', myListings.status, 200, `${myListings.data?.length || 0} listings`);
+
+      // Register a second buyer customer to test P2P purchase
+      const buyerEmail = `buyer_${Date.now()}@cinechain.com`;
+      await post('/api/auth/register', {
+        email: buyerEmail,
+        password: 'Password@123',
+        firstName: 'Marketplace',
+        lastName: 'Buyer'
+      });
+      const buyerLogin = await post('/api/auth/login', { email: buyerEmail, password: 'Password@123' });
+      const buyerToken = buyerLogin.data?.accessToken;
+
+      if (listingId && buyerToken) {
+        const buyRes = await post(`/api/resale/${listingId}/buy`, {
+          newHolderName: 'Marketplace Buyer'
+        }, buyerToken);
+        record('P2P Ticket Purchase & QR Re-issuance', 'POST', `/api/resale/${listingId}/buy`, buyRes.status, 200, `Transferred to: ${buyRes.data?.buyerName}`);
+
+        const buyerPurchases = await get('/api/resale/my-purchases', buyerToken);
+        record('Get Buyer Resale Purchases', 'GET', '/api/resale/my-purchases', buyerPurchases.status, 200, `${buyerPurchases.data?.length || 0} purchased`);
+      }
+    }
+  }
+
+  // 3. Test NFT Stubs
+  const nftStubs = await get('/api/nft-stubs/my-stubs', customerToken);
+  record('Get Customer NFT Stubs', 'GET', '/api/nft-stubs/my-stubs', nftStubs.status, 200, `${nftStubs.data?.length || 0} POAP stubs`);
 
   // SUMMARY REPORT
   console.log('\n========================================================');

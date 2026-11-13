@@ -65,6 +65,18 @@ export class CustomerLayoutComponent implements OnInit, OnDestroy {
       badge: 'VIP'
     },
     {
+      name: 'Resale Marketplace',
+      icon: 'ticket',
+      route: '/resale',
+      badge: 'P2P'
+    },
+    {
+      name: 'My NFT Stubs',
+      icon: 'award',
+      route: '/customer/nft-stubs',
+      badge: 'POAP'
+    },
+    {
       name: 'Booking History',
       icon: 'calendar',
       route: '/customer/bookings'
