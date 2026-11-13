@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "CUSTOMER")
                 .requestMatchers("/api/tickets/**").hasAnyRole("ADMIN", "CUSTOMER")
-                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/ws/**", "/ws-native", "/ws-native/**").permitAll()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
