@@ -466,6 +466,31 @@ async function runAllTests() {
   const nftStubs = await get('/api/nft-stubs/my-stubs', customerToken);
   record('Get Customer NFT Stubs', 'GET', '/api/nft-stubs/my-stubs', nftStubs.status, 200, `${nftStubs.data?.length || 0} POAP stubs`);
 
+  // 12. AI & SMART CINEMA EXPERIENCES (GEMINI API)
+  console.log('\n--- [12/12] AI & SMART CINEMA EXPERIENCES (GEMINI API) ---');
+  
+  // Test AI Concierge Chatbot
+  const aiChatRes = await post('/api/ai/chat', {
+    message: 'Suggest a good action movie playing tonight with comfortable center seats'
+  });
+  record('AI Movie Concierge Chatbot', 'POST', '/api/ai/chat', aiChatRes.status, 200, `Reply snippet: ${aiChatRes.data?.reply?.substring(0, 60)}...`);
+
+  // Test Post Movie Review with AI Moderation
+  const reviewRes = await post('/api/ai/movies/1/reviews', {
+    movieId: 1,
+    rating: 4.5,
+    content: 'Masterful directing and sound design! The pacing is brilliant.'
+  }, customerToken);
+  record('Submit AI-Moderated Movie Review', 'POST', '/api/ai/movies/1/reviews', reviewRes.status, 200, `Sentiment: ${reviewRes.data?.sentiment || 'OK'}, Tags: ${reviewRes.data?.tags || 'N/A'}`);
+
+  // Test Get Movie Reviews
+  const reviewsList = await get('/api/ai/movies/1/reviews');
+  record('Get Approved Movie Reviews', 'GET', '/api/ai/movies/1/reviews', reviewsList.status, 200, `${reviewsList.data?.length || 0} reviews`);
+
+  // Test Get AI Sentiment Summary
+  const sentimentRes = await get('/api/ai/movies/1/sentiment');
+  record('Get AI Sentiment Summary', 'GET', '/api/ai/movies/1/sentiment', sentimentRes.status, 200, `Overall: ${sentimentRes.data?.overallSentiment}`);
+
   // SUMMARY REPORT
   console.log('\n========================================================');
   console.log('                   TEST SUITE SUMMARY                   ');

@@ -30,6 +30,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/public/resale/resale-marketplace.component').then(m => m.ResaleMarketplaceComponent)
   },
   {
+    path: 'concierge',
+    loadComponent: () => import('./features/public/ai-concierge/ai-concierge.component').then(m => m.AiConciergeComponent)
+  },
+  {
     path: 'book/:screeningId',
     loadComponent: () => import('./features/booking/seat-selection/seat-selection.component').then(m => m.SeatSelectionComponent)
   },
@@ -144,6 +148,10 @@ export const routes: Routes = [
       {
         path: 'nft-stubs',
         loadComponent: () => import('./features/customer/nft-stubs/nft-stubs.component').then(m => m.NftStubsComponent)
+      },
+      {
+        path: 'concierge',
+        loadComponent: () => import('./features/public/ai-concierge/ai-concierge.component').then(m => m.AiConciergeComponent)
       },
       {
         path: 'bookings',

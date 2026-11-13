@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
+import { MovieReviewsComponent } from '../movie-reviews/movie-reviews.component';
 import { MovieService } from '../../../../core/services/movie.service';
 import { ScreeningService } from '../../../../core/services/screening.service';
 import { Movie } from '../../../../core/models/movie.model';
@@ -10,7 +11,7 @@ import { Screening } from '../../../../core/models/screening.model';
 @Component({
   selector: 'app-movie-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, NavbarComponent],
+  imports: [CommonModule, RouterModule, NavbarComponent, MovieReviewsComponent],
   templateUrl: './movie-detail.component.html'
 })
 export class MovieDetailComponent implements OnInit {

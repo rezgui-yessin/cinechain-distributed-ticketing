@@ -39,6 +39,10 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY:675896959317332}
   api-secret: ${CLOUDINARY_API_SECRET:9fxNxXuQUOUprJDZNZx0HWyboAQ}
 
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: ${GEMINI_MODEL:gemini-1.5-flash}
+
 logging:
   level:
     com.cinechain: DEBUG

@@ -1,0 +1,175 @@
+<div class="mt-12 space-y-8">
+
+  <!-- AI Smart Sentiment Analysis Summary Box -->
+  <div class="rounded-2xl bg-gradient-to-br from-[#121235] to-[#1c1445] border border-[#2a2a60] p-6 shadow-xl relative overflow-hidden">
+    <div class="absolute -top-12 -right-12 w-44 h-44 bg-teal-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-400 to-indigo-500 flex items-center justify-center text-lg shadow-md shadow-teal-500/20">
+          🤖
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            AI Sentiment & Audience Consensus
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40 font-mono">Gemini Insights</span>
+          </h3>
+          <p class="text-xs text-gray-400">Automated NLP sentiment aggregation & review moderation</p>
+        </div>
+      </div>
+
+      <div *ngIf="sentiment" class="flex items-center gap-2">
+        <span class="text-xs text-gray-400">Overall:</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border" [ngClass]="getSentimentBadgeColor(sentiment.overallSentiment)">
+          {{ sentiment.overallSentiment }}
+        </span>
+      </div>
+    </div>
+
+    <!-- AI Summary Text -->
+    <div *ngIf="!loadingSentiment && sentiment" class="space-y-4">
+      <p class="text-sm text-gray-200 leading-relaxed italic bg-[#0a0a20]/60 p-4 rounded-xl border border-[#202048]">
+        "{{ sentiment.aiSummary }}"
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <!-- Pros -->
+        <div class="bg-[#0f0f29]/80 p-3.5 rounded-xl border border-[#232350]">
+          <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span>✓</span> Audience Highlights (Pros)
+          </h4>
+          <ul class="space-y-1.5">
+            <li *ngFor="let pro of sentiment.topPros" class="text-xs text-gray-300 flex items-start gap-2">
+              <span class="text-emerald-400 mt-0.5">•</span>
+              <span>{{ pro }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Cons & Themes -->
+        <div class="bg-[#0f0f29]/80 p-3.5 rounded-xl border border-[#232350]">
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span>🏷️</span> Key Themes & Critiques
+          </h4>
+          <div class="flex flex-wrap gap-1.5 mb-2" *ngIf="sentiment.keyThemes && sentiment.keyThemes.length > 0">
+            <span *ngFor="let theme of sentiment.keyThemes" class="text-[11px] px-2 py-0.5 rounded-md bg-[#1b1b42] text-gray-300 border border-[#2d2d60]">
+              {{ theme }}
+            </span>
+          </div>
+          <ul class="space-y-1" *ngIf="sentiment.topCons && sentiment.topCons.length > 0">
+            <li *ngFor="let con of sentiment.topCons" class="text-xs text-gray-400 flex items-start gap-2">
+              <span class="text-amber-400 mt-0.5">•</span>
+              <span>{{ con }}</span>
+            </li>
+          </ul>
+          <p *ngIf="(!sentiment.topCons || sentiment.topCons.length === 0) && (!sentiment.keyThemes || sentiment.keyThemes.length === 0)" class="text-xs text-gray-500 italic">
+            No critical themes reported yet.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loadingSentiment" class="p-6 text-center text-xs text-gray-400 font-mono">
+      Analyzing audience sentiment with Gemini...
+    </div>
+  </div>
+
+  <!-- Review Submission Box (Authenticated) -->
+  <div class="rounded-2xl bg-[#10102a] border border-[#24244d] p-6 shadow-lg">
+    <h3 class="text-base font-bold text-white mb-1">Write a Review</h3>
+    <p class="text-xs text-gray-400 mb-4">Reviews are automatically moderated by AI for spoilers & offensive content.</p>
+
+    <div *ngIf="authService.isAuthenticated(); else loginPrompt">
+      <div class="space-y-4">
+        <!-- Rating Select -->
+        <div class="flex items-center gap-3">
+          <label class="text-xs font-medium text-gray-300">Your Rating:</label>
+          <div class="flex items-center gap-1">
+            <button *ngFor="let star of [1,2,3,4,5]"
+                    type="button"
+                    (click)="newRating = star"
+                    class="text-xl transition-colors"
+                    [ngClass]="star <= newRating ? 'text-amber-400' : 'text-gray-600 hover:text-gray-400'">
+              ★
+            </button>
+          </div>
+          <span class="text-xs text-gray-400 font-mono">({{ newRating }} / 5)</span>
+        </div>
+
+        <!-- Content Area -->
+        <div>
+          <textarea
+            [(ngModel)]="newContent"
+            rows="3"
+            placeholder="Share what you loved about the film, performances, cinematography, or sound..."
+            class="w-full bg-[#161638] border border-[#282855] focus:border-teal-400 focus:outline-none rounded-xl p-3 text-sm text-gray-100 placeholder-gray-500"
+          ></textarea>
+        </div>
+
+        <div *ngIf="errorMessage" class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-2.5 rounded-lg">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-lg">
+          {{ successMessage }}
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="button"
+            (click)="submitReview()"
+            [disabled]="submitting || !newContent.trim()"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-40 text-black font-semibold text-xs tracking-wide shadow-md transition-all flex items-center gap-2"
+          >
+            <span *ngIf="!submitting">Submit Review (AI Moderated)</span>
+            <span *ngIf="submitting">Analyzing with Gemini...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loginPrompt>
+      <div class="p-4 rounded-xl bg-[#141433] border border-[#252550] text-center text-xs text-gray-300">
+        Please <a routerLink="/login" class="text-amber-400 font-semibold underline hover:text-amber-300">sign in as a customer</a> to submit an AI-verified review.
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Review List -->
+  <div class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h3 class="text-base font-bold text-white">Audience Reviews ({{ reviews.length }})</h3>
+      <button (click)="loadReviews()" class="text-xs text-teal-400 hover:underline">Refresh</button>
+    </div>
+
+    <div *ngIf="!loadingReviews && reviews.length === 0" class="p-6 rounded-xl bg-[#101026] border border-[#222248] text-center text-xs text-gray-500">
+      No reviews yet. Be the first to share your thoughts!
+    </div>
+
+    <div *ngFor="let r of reviews" class="p-4 rounded-xl bg-[#101026] border border-[#222248] space-y-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-white">{{ r.authorName || 'Verified Guest' }}</span>
+          <div class="flex text-amber-400 text-xs">
+            <span *ngFor="let i of [1,2,3,4,5]">{{ i <= (r.rating || 5) ? '★' : '☆' }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span *ngIf="r.isSpoiler" class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            ⚠️ Spoiler
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full border font-mono" [ngClass]="getSentimentBadgeColor(r.sentiment)">
+            {{ r.sentiment }}
+          </span>
+          <span class="text-[11px] text-gray-500 font-mono">{{ r.createdAt | date:'shortDate' }}</span>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-300 leading-relaxed">{{ r.content }}</p>
+
+      <div *ngIf="r.tags" class="text-[11px] text-teal-400 font-mono">
+        🏷️ {{ r.tags }}
+      </div>
+    </div>
+  </div>
+
+</div>

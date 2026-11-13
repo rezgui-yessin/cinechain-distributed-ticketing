@@ -42,6 +42,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/ai/chat").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/ai/movies/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/cinemas/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/screenings/**").permitAll()
