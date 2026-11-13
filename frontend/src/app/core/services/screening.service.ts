@@ -6,8 +6,8 @@ import { Seat } from '../models/cinema.model';
 
 @Injectable({ providedIn: 'root' })
 export class ScreeningService {
-  private readonly API_URL = 'http://localhost:8080/api/screenings';
-  private readonly ADMIN_URL = 'http://localhost:8080/api/admin/screenings';
+  private readonly API_URL = '/api/screenings';
+  private readonly ADMIN_URL = '/api/admin/screenings';
 
   constructor(private http: HttpClient) {}
 

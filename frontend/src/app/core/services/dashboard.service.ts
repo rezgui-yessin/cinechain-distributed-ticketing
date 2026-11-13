@@ -32,10 +32,10 @@ export class DashboardService {
   constructor(private http: HttpClient) {}
 
   getAdminStats(): Observable<AdminStats> {
-    return this.http.get<AdminStats>('http://localhost:8080/api/admin/dashboard/stats');
+    return this.http.get<AdminStats>('/api/admin/dashboard/stats');
   }
 
   getCustomerStats(): Observable<CustomerStats> {
-    return this.http.get<CustomerStats>('http://localhost:8080/api/customer/dashboard/stats');
+    return this.http.get<CustomerStats>('/api/customer/dashboard/stats');
   }
 }

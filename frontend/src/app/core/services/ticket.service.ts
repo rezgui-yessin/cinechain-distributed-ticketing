@@ -5,7 +5,7 @@ import { Ticket } from '../models/ticket.model';
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
-  private readonly API_URL = 'http://localhost:8080/api/tickets';
+  private readonly API_URL = '/api/tickets';
 
   constructor(private http: HttpClient) {}
 
@@ -26,10 +26,10 @@ export class TicketService {
   }
 
   validateTicket(qrCodeData: string): Observable<any> {
-    return this.http.post<any>(`http://localhost:8080/api/validation/validate`, { qrCodeData });
+    return this.http.post<any>(`/api/validation/validate`, { qrCodeData });
   }
 
   getValidationHistory(): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/validation/history`);
+    return this.http.get<any[]>(`/api/validation/history`);
   }
 }

@@ -5,7 +5,7 @@ import { Movie } from '../models/movie.model';
 
 @Injectable({ providedIn: 'root' })
 export class MovieService {
-  private readonly API_URL = 'http://localhost:8080/api/movies';
+  private readonly API_URL = '/api/movies';
 
   constructor(private http: HttpClient) {}
 

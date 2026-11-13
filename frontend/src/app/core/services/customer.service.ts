@@ -13,7 +13,7 @@ export interface CustomerPage {
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
-  private readonly API_URL = 'http://localhost:8080/api/admin/customers';
+  private readonly API_URL = '/api/admin/customers';
 
   constructor(private http: HttpClient) {}
 

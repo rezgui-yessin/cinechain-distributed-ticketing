@@ -5,7 +5,7 @@ import { Booking, BookingRequest } from '../models/booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
-  private readonly API_URL = 'http://localhost:8080/api/bookings';
+  private readonly API_URL = '/api/bookings';
 
   constructor(private http: HttpClient) {}
 
@@ -22,7 +22,7 @@ export class BookingService {
       .set('page', page.toString())
       .set('size', size.toString());
     if (status) params = params.set('status', status);
-    return this.http.get<any>('http://localhost:8080/api/admin/bookings', { params });
+    return this.http.get<any>('/api/admin/bookings', { params });
   }
 
   getBooking(id: number): Observable<Booking> {

@@ -13,7 +13,7 @@ import { WebSocketService, WsMessage } from './websocket.service';
   providedIn: 'root'
 })
 export class ConcessionService {
-  private readonly baseUrl = 'http://localhost:8080/api/concessions';
+  private readonly baseUrl = '/api/concessions';
 
   constructor(
     private http: HttpClient,

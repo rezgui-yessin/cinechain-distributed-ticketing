@@ -50,7 +50,7 @@ export interface MovieSentimentSummary {
 
 @Injectable({ providedIn: 'root' })
 export class AiService {
-  private readonly API_URL = 'http://localhost:8080/api/ai';
+  private readonly API_URL = '/api/ai';
 
   constructor(private http: HttpClient) {}
 

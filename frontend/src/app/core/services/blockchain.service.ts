@@ -5,7 +5,7 @@ import { BlockchainTransaction } from '../models/blockchain.model';
 
 @Injectable({ providedIn: 'root' })
 export class BlockchainService {
-  private readonly API_URL = 'http://localhost:8080/api/blockchain';
+  private readonly API_URL = '/api/blockchain';
 
   constructor(private http: HttpClient) {}
 

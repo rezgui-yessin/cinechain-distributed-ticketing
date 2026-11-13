@@ -5,9 +5,9 @@ import { Cinema, Hall } from '../models/cinema.model';
 
 @Injectable({ providedIn: 'root' })
 export class CinemaService {
-  private readonly API_URL = 'http://localhost:8080/api/cinemas';
-  private readonly ADMIN_API_URL = 'http://localhost:8080/api/admin/cinemas';
-  private readonly ADMIN_HALLS_URL = 'http://localhost:8080/api/admin/halls';
+  private readonly API_URL = '/api/cinemas';
+  private readonly ADMIN_API_URL = '/api/admin/cinemas';
+  private readonly ADMIN_HALLS_URL = '/api/admin/halls';
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +32,7 @@ export class CinemaService {
   }
 
   getHalls(cinemaId: number): Observable<Hall[]> {
-    return this.http.get<Hall[]>(`http://localhost:8080/api/halls/cinema/${cinemaId}`);
+    return this.http.get<Hall[]>(`/api/halls/cinema/${cinemaId}`);
   }
 
   createHall(cinemaId: number, data: Partial<Hall>): Observable<Hall> {

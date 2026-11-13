@@ -6,7 +6,7 @@ import { AuthResponse, LoginRequest, RegisterRequest } from '../models/user.mode
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = '/api/auth';
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
